@@ -46,33 +46,7 @@ export function UserDropdown({ email, name, image }: iAppProps) {
             {email}
           </span>
         </DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <DropdownMenuGroup>
-          <DropdownMenuItem asChild>
-            <Link href="/favorites">
-              <Heart
-                size={16}
-                strokeWidth={2}
-                className="opacity-60"
-                aria-hidden="true"
-              />
-              <span>Favorites</span>
-            </Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem asChild>
-            <Link href="/my-recipes">
-              <Layers2
-                size={16}
-                strokeWidth={2}
-                className="opacity-60"
-                aria-hidden="true"
-              />
-              <span>My Recipes</span>
-            </Link>
-          </DropdownMenuItem>
-        </DropdownMenuGroup>
 
-        <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
           <form
             action={async () => {
@@ -80,7 +54,10 @@ export function UserDropdown({ email, name, image }: iAppProps) {
               await signOut({ redirectTo: "/" });
             }}
           >
-            <button type="submit" className="w-full flex items-center gap-2">
+            <button
+              type="submit"
+              className="w-full flex items-center gap-2 cursor-pointer"
+            >
               <LogOut
                 size={16}
                 strokeWidth={2}

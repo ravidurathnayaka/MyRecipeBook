@@ -1,0 +1,316 @@
+"use client";
+
+import React, { useState } from "react";
+import {
+  Clock,
+  User,
+  ChefHat,
+  ArrowLeft,
+  Calendar,
+  Lightbulb,
+  CheckCircle2,
+} from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+
+// Prisma enums and types
+enum Category {
+  BREAKFAST = "BREAKFAST",
+  LUNCH = "LUNCH",
+  DINNER = "DINNER",
+  DESSERT = "DESSERT",
+  SNACK = "SNACK",
+}
+
+interface User {
+  id: string;
+  name: string;
+}
+
+interface Recipe {
+  id: string;
+  title: string;
+  description: string;
+  makeTime?: number | null;
+  ingredients: string[];
+  steps: string[];
+  tips?: string | null;
+  category: Category;
+  imageUrl?: string | null;
+  author?: User | null;
+  authorId?: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+interface RecipeDetailPageProps {
+  recipe?: Recipe;
+  onBack?: () => void;
+}
+
+const RecipeDetailPage: React.FC<RecipeDetailPageProps> = ({
+  recipe,
+  onBack,
+}) => {
+  const [checkedSteps, setCheckedSteps] = useState<Set<number>>(new Set());
+
+  // Sample recipe data for demo
+  const sampleRecipe: Recipe = {
+    id: "1",
+    title: "Homemade Margherita Pizza",
+    description:
+      "A classic Italian pizza featuring a crispy thin crust topped with fresh mozzarella, ripe tomatoes, and aromatic basil leaves. This recipe captures the essence of traditional Neapolitan pizza-making.",
+    makeTime: 45,
+    ingredients: [
+      "2 1/4 cups all-purpose flour",
+      "1 tsp salt",
+      "1 tsp sugar",
+      "1 packet active dry yeast",
+      "3/4 cup warm water",
+      "2 tbsp olive oil",
+      "1 cup crushed tomatoes",
+      "8 oz fresh mozzarella cheese",
+      "Fresh basil leaves",
+      "2 cloves garlic, minced",
+      "Salt and pepper to taste",
+    ],
+    steps: [
+      "In a large bowl, combine warm water, sugar, and yeast. Let stand for 5 minutes until foamy.",
+      "Add flour, salt, and olive oil to the yeast mixture. Mix until a dough forms.",
+      "Knead the dough on a floured surface for about 8-10 minutes until smooth and elastic.",
+      "Place dough in a greased bowl, cover with a damp cloth, and let rise in a warm place for 1 hour.",
+      "Preheat your oven to 475°F (245°C). If you have a pizza stone, place it in the oven to heat.",
+      "Punch down the dough and roll it out on a floured surface to your desired thickness.",
+      "Transfer the dough to a pizza pan or peel. Spread crushed tomatoes evenly over the surface.",
+      "Add minced garlic, then tear the mozzarella and distribute it over the pizza.",
+      "Season with salt and pepper. Drizzle with a little olive oil.",
+      "Bake for 12-15 minutes until the crust is golden and the cheese is bubbly.",
+      "Remove from oven, top with fresh basil leaves, slice, and serve immediately.",
+    ],
+    tips: "For the best results, use a pizza stone and preheat it for at least 30 minutes. The high heat creates a crispy crust. You can also use bread flour instead of all-purpose for a chewier texture. Fresh mozzarella works best - drain it well to avoid a soggy pizza.",
+    category: Category.DINNER,
+    imageUrl:
+      "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=1200&q=80",
+    author: { id: "1", name: "Chef Mario Rossi" },
+    authorId: "1",
+    createdAt: new Date("2024-01-15"),
+    updatedAt: new Date("2024-01-15"),
+  };
+
+  const data = recipe || sampleRecipe;
+
+  const getCategoryColor = (category: Category): string => {
+    const colors: Record<Category, string> = {
+      [Category.BREAKFAST]: "bg-amber-100 text-amber-800",
+      [Category.LUNCH]: "bg-emerald-100 text-emerald-800",
+      [Category.DINNER]: "bg-blue-100 text-blue-800",
+      [Category.DESSERT]: "bg-pink-100 text-pink-800",
+      [Category.SNACK]: "bg-purple-100 text-purple-800",
+    };
+    return colors[category];
+  };
+
+  const toggleStep = (index: number) => {
+    const newChecked = new Set(checkedSteps);
+    if (newChecked.has(index)) {
+      newChecked.delete(index);
+    } else {
+      newChecked.add(index);
+    }
+    setCheckedSteps(newChecked);
+  };
+
+  const formatDate = (date: Date): string => {
+    return new Intl.DateTimeFormat("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    }).format(date);
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+      {/* Hero Section */}
+      <div className="relative h-96 w-full">
+        <img
+          src={
+            data.imageUrl ||
+            "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=1200&q=80"
+          }
+          alt={data.title}
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+
+        {/* Back Button */}
+        {onBack && (
+          <button
+            onClick={onBack}
+            className="absolute top-6 left-6 bg-white/90 backdrop-blur-sm hover:bg-white p-3 rounded-full shadow-lg transition-all hover:shadow-xl"
+          >
+            <ArrowLeft className="w-5 h-5 text-slate-900" />
+          </button>
+        )}
+
+        {/* Title Overlay */}
+        <div className="absolute bottom-0 left-0 right-0 p-8 text-white">
+          <div className="max-w-5xl mx-auto">
+            <Badge
+              className={`${getCategoryColor(
+                data.category
+              )} border-0 shadow-md mb-4`}
+            >
+              {data.category}
+            </Badge>
+            <h1 className="text-5xl font-bold mb-3 drop-shadow-lg">
+              {data.title}
+            </h1>
+            <p className="text-lg text-white/90 drop-shadow-md max-w-3xl">
+              {data.description}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="max-w-5xl mx-auto px-8 py-12">
+        {/* Meta Information */}
+        <Card className="mb-8 shadow-lg border-0">
+          <CardContent className="p-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {data.makeTime && (
+                <div className="flex items-center gap-3">
+                  <div className="bg-blue-100 p-3 rounded-full">
+                    <Clock className="w-6 h-6 text-blue-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-slate-500 font-medium">
+                      Prep Time
+                    </p>
+                    <p className="text-lg font-bold text-slate-900">
+                      {data.makeTime} minutes
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {data.author && (
+                <div className="flex items-center gap-3">
+                  <div className="bg-emerald-100 p-3 rounded-full">
+                    <User className="w-6 h-6 text-emerald-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-slate-500 font-medium">
+                      Recipe By
+                    </p>
+                    <p className="text-lg font-bold text-slate-900">
+                      {data.author.name}
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              <div className="flex items-center gap-3">
+                <div className="bg-purple-100 p-3 rounded-full">
+                  <Calendar className="w-6 h-6 text-purple-600" />
+                </div>
+                <div>
+                  <p className="text-sm text-slate-500 font-medium">
+                    Published
+                  </p>
+                  <p className="text-lg font-bold text-slate-900">
+                    {formatDate(data.createdAt)}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Ingredients */}
+          <div className="lg:col-span-1">
+            <Card className="shadow-lg border-0 sticky top-6">
+              <CardContent className="p-6">
+                <h2 className="text-2xl font-bold text-slate-900 mb-4 flex items-center gap-2">
+                  <ChefHat className="w-6 h-6 text-blue-600" />
+                  Ingredients
+                </h2>
+                <ul className="space-y-3">
+                  {data.ingredients.map((ingredient, index) => (
+                    <li
+                      key={index}
+                      className="flex items-start gap-3 text-slate-700"
+                    >
+                      <div className="w-2 h-2 bg-blue-600 rounded-full mt-2 flex-shrink-0" />
+                      <span className="leading-relaxed">{ingredient}</span>
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Steps and Tips */}
+          <div className="lg:col-span-2 space-y-8">
+            {/* Steps */}
+            <Card className="shadow-lg border-0">
+              <CardContent className="p-6">
+                <h2 className="text-2xl font-bold text-slate-900 mb-6">
+                  Instructions
+                </h2>
+                <div className="space-y-4">
+                  {data.steps.map((step, index) => (
+                    <div
+                      key={index}
+                      className={`flex gap-4 p-4 rounded-lg transition-all cursor-pointer ${
+                        checkedSteps.has(index)
+                          ? "bg-green-50 border-2 border-green-200"
+                          : "bg-slate-50 border-2 border-transparent hover:border-slate-200"
+                      }`}
+                      onClick={() => toggleStep(index)}
+                    >
+                      <div className="flex-shrink-0">
+                        {checkedSteps.has(index) ? (
+                          <CheckCircle2 className="w-6 h-6 text-green-600" />
+                        ) : (
+                          <div className="w-6 h-6 rounded-full bg-slate-300 flex items-center justify-center text-white text-sm font-bold">
+                            {index + 1}
+                          </div>
+                        )}
+                      </div>
+                      <p
+                        className={`leading-relaxed ${
+                          checkedSteps.has(index)
+                            ? "text-green-900 line-through"
+                            : "text-slate-700"
+                        }`}
+                      >
+                        {step}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Tips */}
+            {data.tips && (
+              <Card className="shadow-lg border-0 bg-gradient-to-br from-amber-50 to-orange-50">
+                <CardContent className="p-6">
+                  <h2 className="text-2xl font-bold text-slate-900 mb-4 flex items-center gap-2">
+                    <Lightbulb className="w-6 h-6 text-amber-600" />
+                    Pro Tips
+                  </h2>
+                  <p className="text-slate-700 leading-relaxed">{data.tips}</p>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default RecipeDetailPage;
