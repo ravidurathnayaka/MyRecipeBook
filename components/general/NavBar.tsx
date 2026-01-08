@@ -18,7 +18,7 @@ const Navbar = async () => {
       <div className="hidden md:flex items-center gap-5">
         <ThemeToggle />
         <Link href="/create-recipe" className={buttonVariants({ size: "lg" })}>
-          Create Recipe
+          Add Recipe +
         </Link>
         {session?.user ? (
           <UserDropdown
