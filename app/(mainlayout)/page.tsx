@@ -1,7 +1,15 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Search, Plus, Loader2, Filter, X } from "lucide-react";
+import {
+  Search,
+  Plus,
+  Loader2,
+  Filter,
+  X,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import {
   Card,
   CardContent,
@@ -44,6 +52,8 @@ interface Recipe {
   updatedAt: string;
 }
 
+const RECIPES_PER_PAGE = 6;
+
 const RecipeHomePage: React.FC = () => {
   const { data: session } = useSession();
   const [recipes, setRecipes] = useState<Recipe[]>([]);
@@ -54,6 +64,7 @@ const RecipeHomePage: React.FC = () => {
     "ALL"
   );
   const [showFilters, setShowFilters] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     fetchRecipes();
@@ -61,6 +72,7 @@ const RecipeHomePage: React.FC = () => {
 
   useEffect(() => {
     filterRecipes();
+    setCurrentPage(1); // Reset to first page when filters change
   }, [recipes, searchQuery, selectedCategory]);
 
   const fetchRecipes = async () => {
@@ -110,7 +122,7 @@ const RecipeHomePage: React.FC = () => {
 
   const handleCreateRecipe = () => {
     // Navigate to create recipe page
-    window.location.href = "/recipes/create";
+    window.location.href = "/create-recipe";
   };
 
   const clearFilters = () => {
@@ -130,6 +142,67 @@ const RecipeHomePage: React.FC = () => {
       [Category.SNACK]: "bg-purple-100 text-purple-800 border-purple-300",
     };
     return colors[category];
+  };
+
+  // Pagination calculations
+  const totalPages = Math.ceil(filteredRecipes.length / RECIPES_PER_PAGE);
+  const startIndex = (currentPage - 1) * RECIPES_PER_PAGE;
+  const endIndex = startIndex + RECIPES_PER_PAGE;
+  const currentRecipes = filteredRecipes.slice(startIndex, endIndex);
+
+  const goToPage = (page: number) => {
+    setCurrentPage(page);
+    // Scroll to top of results
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const goToPrevious = () => {
+    if (currentPage > 1) {
+      goToPage(currentPage - 1);
+    }
+  };
+
+  const goToNext = () => {
+    if (currentPage < totalPages) {
+      goToPage(currentPage + 1);
+    }
+  };
+
+  // Generate page numbers to display
+  const getPageNumbers = () => {
+    const pages: (number | string)[] = [];
+
+    if (totalPages <= 7) {
+      // Show all pages if 7 or fewer
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      // Always show first page
+      pages.push(1);
+
+      if (currentPage > 3) {
+        pages.push("...");
+      }
+
+      // Show pages around current page
+      for (
+        let i = Math.max(2, currentPage - 1);
+        i <= Math.min(totalPages - 1, currentPage + 1);
+        i++
+      ) {
+        pages.push(i);
+      }
+
+      if (currentPage < totalPages - 2) {
+        pages.push("...");
+      }
+
+      // Always show last page
+      pages.push(totalPages);
+    }
+
+    return pages;
   };
 
   return (
@@ -210,7 +283,7 @@ const RecipeHomePage: React.FC = () => {
         </div>
 
         {/* Results Count */}
-        <div className="mb-6">
+        <div className="mb-6 flex items-center justify-between">
           <p className="text-slate-600">
             {loading ? (
               "Loading recipes..."
@@ -218,16 +291,30 @@ const RecipeHomePage: React.FC = () => {
               <>
                 Showing{" "}
                 <span className="font-semibold text-slate-900">
-                  {filteredRecipes.length}
+                  {startIndex + 1}
+                </span>{" "}
+                -{" "}
+                <span className="font-semibold text-slate-900">
+                  {Math.min(endIndex, filteredRecipes.length)}
                 </span>{" "}
                 of{" "}
                 <span className="font-semibold text-slate-900">
-                  {recipes.length}
+                  {filteredRecipes.length}
                 </span>{" "}
                 recipes
               </>
             )}
           </p>
+          {!loading && totalPages > 1 && (
+            <p className="text-slate-600">
+              Page{" "}
+              <span className="font-semibold text-slate-900">
+                {currentPage}
+              </span>{" "}
+              of{" "}
+              <span className="font-semibold text-slate-900">{totalPages}</span>
+            </p>
+          )}
         </div>
 
         {/* Loading State */}
@@ -267,16 +354,59 @@ const RecipeHomePage: React.FC = () => {
         )}
 
         {/* Recipe Grid */}
-        {!loading && filteredRecipes.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredRecipes.map((recipe) => (
-              <RecipeCard
-                key={recipe.id}
-                recipe={recipe}
-                onClick={() => handleRecipeClick(recipe.id)}
-              />
-            ))}
-          </div>
+        {!loading && currentRecipes.length > 0 && (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+              {currentRecipes.map((recipe) => (
+                <RecipeCard
+                  key={recipe.id}
+                  recipe={recipe}
+                  onClick={() => handleRecipeClick(recipe.id)}
+                />
+              ))}
+            </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-center gap-2">
+                <button
+                  onClick={goToPrevious}
+                  disabled={currentPage === 1}
+                  className="p-2 rounded-lg border-2 border-slate-200 hover:border-slate-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors bg-white"
+                >
+                  <ChevronLeft className="w-5 h-5 text-slate-600" />
+                </button>
+
+                {getPageNumbers().map((page, index) =>
+                  typeof page === "number" ? (
+                    <button
+                      key={index}
+                      onClick={() => goToPage(page)}
+                      className={`h-10 w-10 rounded-lg border-2 font-semibold transition-colors ${
+                        currentPage === page
+                          ? "bg-slate-900 text-white border-slate-900"
+                          : "bg-white text-slate-700 border-slate-200 hover:border-slate-300"
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  ) : (
+                    <span key={index} className="px-2 text-slate-400">
+                      {page}
+                    </span>
+                  )
+                )}
+
+                <button
+                  onClick={goToNext}
+                  disabled={currentPage === totalPages}
+                  className="p-2 rounded-lg border-2 border-slate-200 hover:border-slate-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors bg-white"
+                >
+                  <ChevronRight className="w-5 h-5 text-slate-600" />
+                </button>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>

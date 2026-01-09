@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Clock,
   User,
@@ -9,9 +9,12 @@ import {
   Calendar,
   Lightbulb,
   CheckCircle2,
+  Loader2,
+  AlertCircle,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { useParams, useRouter } from "next/navigation";
 
 // Prisma enums and types
 enum Category {
@@ -24,7 +27,9 @@ enum Category {
 
 interface User {
   id: string;
-  name: string;
+  name: string | null;
+  email: string;
+  image: string | null;
 }
 
 interface Recipe {
@@ -39,65 +44,51 @@ interface Recipe {
   imageUrl?: string | null;
   author?: User | null;
   authorId?: string | null;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string;
+  updatedAt: string;
 }
 
 interface RecipeDetailPageProps {
-  recipe?: Recipe;
-  onBack?: () => void;
+  recipeId: string;
 }
 
-const RecipeDetailPage: React.FC<RecipeDetailPageProps> = ({
-  recipe,
-  onBack,
-}) => {
+const RecipeDetailPage: React.FC<RecipeDetailPageProps> = () => {
+  const { id } = useParams<{ id: string }>();
+
+  console.log(id);
+  const router = useRouter();
+  const [recipe, setRecipe] = useState<Recipe | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [checkedSteps, setCheckedSteps] = useState<Set<number>>(new Set());
 
-  // Sample recipe data for demo
-  const sampleRecipe: Recipe = {
-    id: "1",
-    title: "Homemade Margherita Pizza",
-    description:
-      "A classic Italian pizza featuring a crispy thin crust topped with fresh mozzarella, ripe tomatoes, and aromatic basil leaves. This recipe captures the essence of traditional Neapolitan pizza-making.",
-    makeTime: 45,
-    ingredients: [
-      "2 1/4 cups all-purpose flour",
-      "1 tsp salt",
-      "1 tsp sugar",
-      "1 packet active dry yeast",
-      "3/4 cup warm water",
-      "2 tbsp olive oil",
-      "1 cup crushed tomatoes",
-      "8 oz fresh mozzarella cheese",
-      "Fresh basil leaves",
-      "2 cloves garlic, minced",
-      "Salt and pepper to taste",
-    ],
-    steps: [
-      "In a large bowl, combine warm water, sugar, and yeast. Let stand for 5 minutes until foamy.",
-      "Add flour, salt, and olive oil to the yeast mixture. Mix until a dough forms.",
-      "Knead the dough on a floured surface for about 8-10 minutes until smooth and elastic.",
-      "Place dough in a greased bowl, cover with a damp cloth, and let rise in a warm place for 1 hour.",
-      "Preheat your oven to 475°F (245°C). If you have a pizza stone, place it in the oven to heat.",
-      "Punch down the dough and roll it out on a floured surface to your desired thickness.",
-      "Transfer the dough to a pizza pan or peel. Spread crushed tomatoes evenly over the surface.",
-      "Add minced garlic, then tear the mozzarella and distribute it over the pizza.",
-      "Season with salt and pepper. Drizzle with a little olive oil.",
-      "Bake for 12-15 minutes until the crust is golden and the cheese is bubbly.",
-      "Remove from oven, top with fresh basil leaves, slice, and serve immediately.",
-    ],
-    tips: "For the best results, use a pizza stone and preheat it for at least 30 minutes. The high heat creates a crispy crust. You can also use bread flour instead of all-purpose for a chewier texture. Fresh mozzarella works best - drain it well to avoid a soggy pizza.",
-    category: Category.DINNER,
-    imageUrl:
-      "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=1200&q=80",
-    author: { id: "1", name: "Chef Mario Rossi" },
-    authorId: "1",
-    createdAt: new Date("2024-01-15"),
-    updatedAt: new Date("2024-01-15"),
-  };
+  useEffect(() => {
+    fetchRecipe();
+  }, [id]);
 
-  const data = recipe || sampleRecipe;
+  const fetchRecipe = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const response = await fetch(`/api/recipes/${id}`);
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          throw new Error("Recipe not found");
+        }
+        throw new Error("Failed to fetch recipe");
+      }
+
+      const data = await response.json();
+      setRecipe(data);
+    } catch (err) {
+      console.error("Error fetching recipe:", err);
+      setError(err instanceof Error ? err.message : "Failed to load recipe");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const getCategoryColor = (category: Category): string => {
     const colors: Record<Category, string> = {
@@ -120,7 +111,8 @@ const RecipeDetailPage: React.FC<RecipeDetailPageProps> = ({
     setCheckedSteps(newChecked);
   };
 
-  const formatDate = (date: Date): string => {
+  const formatDate = (dateString: string): string => {
+    const date = new Date(dateString);
     return new Intl.DateTimeFormat("en-US", {
       year: "numeric",
       month: "long",
@@ -128,45 +120,88 @@ const RecipeDetailPage: React.FC<RecipeDetailPageProps> = ({
     }).format(date);
   };
 
+  const handleBack = () => {
+    router.push("/");
+  };
+
+  // Loading State
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-12 h-12 animate-spin text-slate-600 mx-auto mb-4" />
+          <p className="text-slate-600">Loading recipe...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Error State
+  if (error || !recipe) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center px-4">
+        <Card className="max-w-md w-full shadow-xl border-0 text-center">
+          <CardContent className="pt-12 pb-8">
+            <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <AlertCircle className="w-12 h-12 text-red-600" />
+            </div>
+            <h2 className="text-3xl font-bold text-slate-900 mb-3">
+              {error === "Recipe not found"
+                ? "Recipe Not Found"
+                : "Error Loading Recipe"}
+            </h2>
+            <p className="text-slate-600 mb-6">
+              {error || "Something went wrong while loading the recipe."}
+            </p>
+            <button
+              onClick={handleBack}
+              className="px-6 py-3 bg-slate-900 text-white rounded-lg font-semibold hover:bg-slate-800 transition-colors"
+            >
+              Back to Home
+            </button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
       {/* Hero Section */}
       <div className="relative h-96 w-full">
         <img
           src={
-            data.imageUrl ||
+            recipe.imageUrl ||
             "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=1200&q=80"
           }
-          alt={data.title}
+          alt={recipe.title}
           className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
 
         {/* Back Button */}
-        {onBack && (
-          <button
-            onClick={onBack}
-            className="absolute top-6 left-6 bg-white/90 backdrop-blur-sm hover:bg-white p-3 rounded-full shadow-lg transition-all hover:shadow-xl"
-          >
-            <ArrowLeft className="w-5 h-5 text-slate-900" />
-          </button>
-        )}
+        <button
+          onClick={handleBack}
+          className="absolute top-6 left-6 bg-white/90 backdrop-blur-sm hover:bg-white p-3 rounded-full shadow-lg transition-all hover:shadow-xl"
+        >
+          <ArrowLeft className="w-5 h-5 text-slate-900" />
+        </button>
 
         {/* Title Overlay */}
         <div className="absolute bottom-0 left-0 right-0 p-8 text-white">
           <div className="max-w-5xl mx-auto">
             <Badge
               className={`${getCategoryColor(
-                data.category
+                recipe.category
               )} border-0 shadow-md mb-4`}
             >
-              {data.category}
+              {recipe.category}
             </Badge>
             <h1 className="text-5xl font-bold mb-3 drop-shadow-lg">
-              {data.title}
+              {recipe.title}
             </h1>
             <p className="text-lg text-white/90 drop-shadow-md max-w-3xl">
-              {data.description}
+              {recipe.description}
             </p>
           </div>
         </div>
@@ -178,7 +213,7 @@ const RecipeDetailPage: React.FC<RecipeDetailPageProps> = ({
         <Card className="mb-8 shadow-lg border-0">
           <CardContent className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {data.makeTime && (
+              {recipe.makeTime && (
                 <div className="flex items-center gap-3">
                   <div className="bg-blue-100 p-3 rounded-full">
                     <Clock className="w-6 h-6 text-blue-600" />
@@ -188,23 +223,31 @@ const RecipeDetailPage: React.FC<RecipeDetailPageProps> = ({
                       Prep Time
                     </p>
                     <p className="text-lg font-bold text-slate-900">
-                      {data.makeTime} minutes
+                      {recipe.makeTime} minutes
                     </p>
                   </div>
                 </div>
               )}
 
-              {data.author && (
+              {recipe.author && (
                 <div className="flex items-center gap-3">
-                  <div className="bg-emerald-100 p-3 rounded-full">
-                    <User className="w-6 h-6 text-emerald-600" />
-                  </div>
+                  {recipe.author.image ? (
+                    <img
+                      src={recipe.author.image}
+                      alt={recipe.author.name || "User"}
+                      className="w-12 h-12 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="bg-emerald-100 p-3 rounded-full">
+                      <User className="w-6 h-6 text-emerald-600" />
+                    </div>
+                  )}
                   <div>
                     <p className="text-sm text-slate-500 font-medium">
                       Recipe By
                     </p>
                     <p className="text-lg font-bold text-slate-900">
-                      {data.author.name}
+                      {recipe.author.name || "Anonymous"}
                     </p>
                   </div>
                 </div>
@@ -219,7 +262,7 @@ const RecipeDetailPage: React.FC<RecipeDetailPageProps> = ({
                     Published
                   </p>
                   <p className="text-lg font-bold text-slate-900">
-                    {formatDate(data.createdAt)}
+                    {formatDate(recipe.createdAt)}
                   </p>
                 </div>
               </div>
@@ -237,7 +280,7 @@ const RecipeDetailPage: React.FC<RecipeDetailPageProps> = ({
                   Ingredients
                 </h2>
                 <ul className="space-y-3">
-                  {data.ingredients.map((ingredient, index) => (
+                  {recipe.ingredients.map((ingredient, index) => (
                     <li
                       key={index}
                       className="flex items-start gap-3 text-slate-700"
@@ -260,7 +303,7 @@ const RecipeDetailPage: React.FC<RecipeDetailPageProps> = ({
                   Instructions
                 </h2>
                 <div className="space-y-4">
-                  {data.steps.map((step, index) => (
+                  {recipe.steps.map((step, index) => (
                     <div
                       key={index}
                       className={`flex gap-4 p-4 rounded-lg transition-all cursor-pointer ${
@@ -295,14 +338,16 @@ const RecipeDetailPage: React.FC<RecipeDetailPageProps> = ({
             </Card>
 
             {/* Tips */}
-            {data.tips && (
+            {recipe.tips && (
               <Card className="shadow-lg border-0 bg-gradient-to-br from-amber-50 to-orange-50">
                 <CardContent className="p-6">
                   <h2 className="text-2xl font-bold text-slate-900 mb-4 flex items-center gap-2">
                     <Lightbulb className="w-6 h-6 text-amber-600" />
                     Pro Tips
                   </h2>
-                  <p className="text-slate-700 leading-relaxed">{data.tips}</p>
+                  <p className="text-slate-700 leading-relaxed">
+                    {recipe.tips}
+                  </p>
                 </CardContent>
               </Card>
             )}

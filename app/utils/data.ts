@@ -44,7 +44,7 @@ export const recipes = [
     imageUrl:
       "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=1200&q=80",
     author: { id: "1", name: "Chef Mario Rossi" },
-    authorId: "1",
+    authorId: "cmk466xh20000awidg56vg4tf",
     createdAt: new Date("2024-01-15"),
     updatedAt: new Date("2024-01-15"),
   },
@@ -76,7 +76,7 @@ export const recipes = [
     imageUrl:
       "https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=1200&q=80",
     author: { id: "2", name: "Chef Luca Romano" },
-    authorId: "2",
+    authorId: "cmk466xh20000awidg56vg4tf",
     createdAt: new Date("2024-02-01"),
     updatedAt: new Date("2024-02-01"),
   },
@@ -107,7 +107,7 @@ export const recipes = [
     imageUrl:
       "https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&w=1200&q=80",
     author: { id: "3", name: "Chef Lin Wei" },
-    authorId: "3",
+    authorId: "cmk466xh20000awidg56vg4tf",
     createdAt: new Date("2024-02-05"),
     updatedAt: new Date("2024-02-05"),
   },
@@ -135,7 +135,7 @@ export const recipes = [
     imageUrl:
       "https://images.unsplash.com/photo-1551183053-bf91a1d81141?w=1200&q=80",
     author: { id: "4", name: "Chef Emma Green" },
-    authorId: "4",
+    authorId: "cmk466xh20000awidg56vg4tf",
     createdAt: new Date("2024-02-10"),
     updatedAt: new Date("2024-02-10"),
   },
@@ -165,7 +165,7 @@ export const recipes = [
     imageUrl:
       "https://images.unsplash.com/photo-1550547660-d9450f859349?w=1200&q=80",
     author: { id: "5", name: "Chef John Miller" },
-    authorId: "5",
+    authorId: "cmk466xh20000awidg56vg4tf",
     createdAt: new Date("2024-02-12"),
     updatedAt: new Date("2024-02-12"),
   },
@@ -194,7 +194,7 @@ export const recipes = [
     imageUrl:
       "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=1200&q=80",
     author: { id: "6", name: "Chef Mei Wong" },
-    authorId: "6",
+    authorId: "cmk466xh20000awidg56vg4tf",
     createdAt: new Date("2024-02-15"),
     updatedAt: new Date("2024-02-15"),
   },
@@ -222,7 +222,7 @@ export const recipes = [
     imageUrl:
       "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?auto=format&fit=crop&w=1200&q=80",
     author: { id: "7", name: "Chef Anna Lee" },
-    authorId: "7",
+    authorId: "cmk466xh20000awidg56vg4tf",
     createdAt: new Date("2024-02-18"),
     updatedAt: new Date("2024-02-18"),
   },
@@ -248,7 +248,7 @@ export const recipes = [
     imageUrl:
       "https://images.unsplash.com/photo-1550304943-4f24f54ddde9?w=1200&q=80",
     author: { id: "8", name: "Chef Olivia Brown" },
-    authorId: "8",
+    authorId: "cmk466xh20000awidg56vg4tf",
     createdAt: new Date("2024-02-20"),
     updatedAt: new Date("2024-02-20"),
   },
@@ -276,7 +276,7 @@ export const recipes = [
     imageUrl:
       "https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=1200&q=80",
     author: { id: "9", name: "Chef Noah Smith" },
-    authorId: "9",
+    authorId: "cmk466xh20000awidg56vg4tf",
     createdAt: new Date("2024-02-22"),
     updatedAt: new Date("2024-02-22"),
   },
@@ -303,7 +303,7 @@ export const recipes = [
     imageUrl:
       "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=1200&q=80",
     author: { id: "10", name: "Chef Daniel King" },
-    authorId: "10",
+    authorId: "cmk466xh20000awidg56vg4tf",
     createdAt: new Date("2024-02-25"),
     updatedAt: new Date("2024-02-25"),
   },

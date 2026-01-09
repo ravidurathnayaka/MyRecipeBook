@@ -1,16 +1,15 @@
 import prisma from "@/app/utils/db";
 import { NextResponse } from "next/server";
 
-// GET a recipe
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await context.params; // ✅ REQUIRED FIX
+
     const recipe = await prisma.recipe.findUnique({
-      where: {
-        id: params.id,
-      },
+      where: { id },
       include: {
         author: {
           select: {
