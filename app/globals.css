@@ -121,3 +121,7 @@
     @apply bg-background text-foreground;
   }
 }
+
+footer {
+  background-color: #101828 !important;
+}

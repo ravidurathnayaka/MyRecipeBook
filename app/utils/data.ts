@@ -6,7 +6,7 @@ enum Category {
   SNACK = "SNACK",
 }
 
-const recipes = [
+export const recipes = [
   {
     id: "1",
     title: "Homemade Margherita Pizza",
@@ -105,7 +105,7 @@ const recipes = [
     tips: "Use cold rice for best texture.",
     category: Category.LUNCH,
     imageUrl:
-      "https://images.unsplash.com/photo-1604908177522-4327c6a0b823?w=1200&q=80",
+      "https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&w=1200&q=80",
     author: { id: "3", name: "Chef Lin Wei" },
     authorId: "3",
     createdAt: new Date("2024-02-05"),
@@ -220,7 +220,7 @@ const recipes = [
     tips: "Do not overmix the batter.",
     category: Category.BREAKFAST,
     imageUrl:
-      "https://images.unsplash.com/photo-1587738347117-62d0e19f2d14?w=1200&q=80",
+      "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?auto=format&fit=crop&w=1200&q=80",
     author: { id: "7", name: "Chef Anna Lee" },
     authorId: "7",
     createdAt: new Date("2024-02-18"),
@@ -306,25 +306,5 @@ const recipes = [
     authorId: "10",
     createdAt: new Date("2024-02-25"),
     updatedAt: new Date("2024-02-25"),
-  },
-  {
-    id: "11",
-    title: "Mixed Fruit Smoothie",
-    description: "A refreshing and healthy smoothie made with fresh fruits.",
-    makeTime: 5,
-    ingredients: ["Banana", "Strawberries", "Mango", "Milk or yogurt", "Honey"],
-    steps: [
-      "Add all ingredients to blender.",
-      "Blend until smooth.",
-      "Serve chilled.",
-    ],
-    tips: "Use frozen fruits for a thicker smoothie.",
-    category: Category.BREAKFAST,
-    imageUrl:
-      "https://images.unsplash.com/photo-1553530666-3a31b1a6c7c8?w=1200&q=80",
-    author: { id: "11", name: "Chef Sophia White" },
-    authorId: "11",
-    createdAt: new Date("2024-02-28"),
-    updatedAt: new Date("2024-02-28"),
   },
 ];
