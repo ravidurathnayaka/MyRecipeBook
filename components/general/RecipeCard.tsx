@@ -3,17 +3,70 @@ import { Card, CardContent, CardFooter, CardHeader } from "../ui/card";
 import { Badge } from "../ui/badge";
 import Link from "next/link";
 
-const RecipeCard = ({ recipe }: any) => {
+enum Category {
+  BREAKFAST = "BREAKFAST",
+  LUNCH = "LUNCH",
+  DINNER = "DINNER",
+  DESSERT = "DESSERT",
+  SNACK = "SNACK",
+}
+
+interface User {
+  id: string;
+  name: string | null;
+  email: string;
+  image: string | null;
+}
+
+interface Recipe {
+  id: string;
+  title: string;
+  description: string;
+  makeTime?: number | null;
+  ingredients: string[];
+  steps: string[];
+  tips?: string | null;
+  category: Category;
+  imageUrl?: string | null;
+  author?: User | null;
+  authorId?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+const RecipeCard: React.FC<{ recipe: Recipe; onClick: () => void }> = ({
+  recipe,
+  onClick,
+}) => {
+  const getCategoryColor = (category: Category): string => {
+    const colors: Record<Category, string> = {
+      [Category.BREAKFAST]: "bg-amber-100 text-amber-800 hover:bg-amber-200",
+      [Category.LUNCH]: "bg-emerald-100 text-emerald-800 hover:bg-emerald-200",
+      [Category.DINNER]: "bg-blue-100 text-blue-800 hover:bg-blue-200",
+      [Category.DESSERT]: "bg-pink-100 text-pink-800 hover:bg-pink-200",
+      [Category.SNACK]: "bg-purple-100 text-purple-800 hover:bg-purple-200",
+    };
+    return colors[category];
+  };
   return (
     <Card className="w-full max-w-sm overflow-hidden hover:shadow-xl transition-all duration-300 border-0 shadow-md group flex flex-col self-center mx-auto pt-0">
       <div className="relative overflow-hidden">
         <img
-          src={recipe.imageUrl}
+          src={
+            recipe.imageUrl ||
+            "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=80"
+          }
           alt={recipe.title}
           className="w-full h-56 object-cover transition-transform duration-500 group-hover:scale-110"
         />
         <div className="absolute top-3 left-3">
-          <Badge className={` border-0 shadow-sm`}>{recipe.category}</Badge>
+          <Badge
+            className={`${getCategoryColor(
+              recipe.category
+            )} border-0 shadow-sm`}
+          >
+            {recipe.category}
+          </Badge>
         </div>
         {recipe.makeTime && (
           <div className="absolute top-3 right-3 bg-white/95 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-md flex items-center gap-1.5">

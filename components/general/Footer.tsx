@@ -2,7 +2,7 @@ import Link from "next/link";
 
 const Footer = async () => {
   return (
-    <footer className="w-full bg-gray-900  text-gray-300 border-2 mt-10">
+    <footer className="w-full bg-gray-900  text-gray-300">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4  py-6">
         <Link href="/">
           <div className="text-xl font-bold">MyRecipeBook</div>
