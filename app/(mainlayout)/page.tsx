@@ -208,6 +208,15 @@ const RecipeHomePage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Header */}
+        <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-slate-900">All Recipes</h1>
+            <p className="text-slate-600 mt-1">
+              Discover variant recipes and enjoy
+            </p>
+          </div>
+        </div>
         {/* Search and Filter */}
         <div className="mb-8 space-y-4">
           <div className="flex gap-4">

@@ -13,6 +13,7 @@ import {
 
 import { ChevronDown, Heart, Layers2, LogOut } from "lucide-react";
 import Link from "next/link";
+import { handleSignOut } from "@/app/action";
 
 interface iAppProps {
   email: string;
@@ -48,12 +49,7 @@ export function UserDropdown({ email, name, image }: iAppProps) {
         </DropdownMenuLabel>
 
         <DropdownMenuItem asChild>
-          <form
-            action={async () => {
-              "use server";
-              await signOut({ redirectTo: "/" });
-            }}
-          >
+          <form action={handleSignOut}>
             <button
               type="submit"
               className="w-full flex items-center gap-2 cursor-pointer"

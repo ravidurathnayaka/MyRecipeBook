@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Plus,
   Upload,
@@ -13,6 +13,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useSession } from "next-auth/react";
+import { useRouter, useParams } from "next/navigation";
 
 // Prisma enums and types
 enum Category {
@@ -34,19 +35,11 @@ interface RecipeFormData {
   imageUrl: string;
 }
 
-interface RecipeCreatePageProps {
-  onSuccess?: (recipeId: string) => void;
-  onCancel?: () => void;
-}
-
-const RecipeCreatePage: React.FC<RecipeCreatePageProps> = ({
-  onSuccess,
-  onCancel,
-}) => {
+const RecipeEditPage: React.FC = () => {
   const { data: session, status } = useSession();
-
-  console.log("status:", status);
-  console.log("session:", JSON.stringify(session, null, 2));
+  const router = useRouter();
+  const params = useParams();
+  const recipeId = params?.recipeId as string;
 
   const [formData, setFormData] = useState<RecipeFormData>({
     title: "",
@@ -62,7 +55,60 @@ const RecipeCreatePage: React.FC<RecipeCreatePageProps> = ({
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [imagePreview, setImagePreview] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (recipeId && status === "authenticated") {
+      fetchRecipe();
+    }
+  }, [recipeId, status]);
+
+  const fetchRecipe = async () => {
+    try {
+      setIsLoading(true);
+      const response = await fetch(`/api/recipes/${recipeId}`);
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          throw new Error("Recipe not found");
+        }
+        throw new Error("Failed to fetch recipe");
+      }
+
+      const recipe = await response.json();
+
+      // Check if user is the author
+      const userId = (session?.user as any)?.id;
+      if (recipe.authorId !== userId) {
+        throw new Error("You do not have permission to edit this recipe");
+      }
+
+      // Populate form with recipe data
+      setFormData({
+        title: recipe.title,
+        description: recipe.description,
+        makeTime: recipe.makeTime?.toString() || "",
+        ingredients: recipe.ingredients.length > 0 ? recipe.ingredients : [""],
+        steps: recipe.steps.length > 0 ? recipe.steps : [""],
+        tips: recipe.tips || "",
+        category: recipe.category,
+        imageUrl: recipe.imageUrl || "",
+      });
+
+      if (recipe.imageUrl) {
+        setImagePreview(recipe.imageUrl);
+      }
+    } catch (error) {
+      console.error("Error fetching recipe:", error);
+      setLoadError(
+        error instanceof Error ? error.message : "Failed to load recipe"
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const updateField = (field: keyof RecipeFormData, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -143,15 +189,19 @@ const RecipeCreatePage: React.FC<RecipeCreatePageProps> = ({
     return Object.keys(newErrors).length === 0;
   };
 
-  const createRecipe = async () => {
+  const updateRecipe = async () => {
     if (!validateForm()) {
+      return;
+    }
+
+    if (status !== "authenticated") {
+      setErrors({ submit: "You must be logged in to update a recipe." });
       return;
     }
 
     setIsSubmitting(true);
 
     try {
-      // Prepare the data for database
       const recipeData = {
         title: formData.title.trim(),
         description: formData.description.trim(),
@@ -161,12 +211,10 @@ const RecipeCreatePage: React.FC<RecipeCreatePageProps> = ({
         tips: formData.tips.trim() || null,
         category: formData.category,
         imageUrl: formData.imageUrl.trim() || null,
-        authorId: session?.user?.id,
       };
 
-      // API call to create recipe
-      const response = await fetch("/api/recipes", {
-        method: "POST",
+      const response = await fetch(`/api/recipes/${recipeId}`, {
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
@@ -175,27 +223,21 @@ const RecipeCreatePage: React.FC<RecipeCreatePageProps> = ({
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.message || "Failed to create recipe");
+        throw new Error(error.message || "Failed to update recipe");
       }
 
-      const result = await response.json();
-
-      // Show success state
       setSubmitSuccess(true);
 
-      // Wait a moment to show success animation
       setTimeout(() => {
-        if (onSuccess) {
-          onSuccess(result.id);
-        }
+        router.push("/my-recipe");
       }, 1500);
     } catch (error) {
-      console.error("Error creating recipe:", error);
+      console.error("Error updating recipe:", error);
       setErrors({
         submit:
           error instanceof Error
             ? error.message
-            : "Failed to create recipe. Please try again.",
+            : "Failed to update recipe. Please try again.",
       });
       setIsSubmitting(false);
     }
@@ -212,6 +254,42 @@ const RecipeCreatePage: React.FC<RecipeCreatePageProps> = ({
     return colors[category];
   };
 
+  // Loading state
+  if (isLoading || status === "loading") {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-12 h-12 animate-spin text-slate-600 mx-auto mb-4" />
+          <p className="text-slate-600">Loading recipe...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (loadError) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center px-4">
+        <Card className="max-w-md w-full shadow-xl border-0 text-center">
+          <CardContent className="pt-12 pb-8">
+            <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <ArrowLeft className="w-12 h-12 text-red-600" />
+            </div>
+            <h2 className="text-3xl font-bold text-slate-900 mb-3">Error</h2>
+            <p className="text-slate-600 mb-6">{loadError}</p>
+            <button
+              onClick={() => router.push("/my-recipe")}
+              className="px-6 py-3 bg-slate-900 text-white rounded-lg font-semibold hover:bg-slate-800 transition-colors"
+            >
+              Back to My Recipes
+            </button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // Success state
   if (submitSuccess) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center px-4">
@@ -221,10 +299,10 @@ const RecipeCreatePage: React.FC<RecipeCreatePageProps> = ({
               <CheckCircle className="w-12 h-12 text-green-600" />
             </div>
             <h2 className="text-3xl font-bold text-slate-900 mb-3">
-              Recipe Created!
+              Recipe Updated!
             </h2>
             <p className="text-slate-600 mb-6">
-              Your recipe has been successfully saved to the database.
+              Your recipe has been successfully updated.
             </p>
           </CardContent>
         </Card>
@@ -238,21 +316,17 @@ const RecipeCreatePage: React.FC<RecipeCreatePageProps> = ({
         <div className="mb-8 flex items-center justify-between">
           <div>
             <h1 className="text-4xl font-bold text-slate-900 mb-2">
-              Create New Recipe
+              Edit Recipe
             </h1>
-            <p className="text-slate-600">
-              Share your culinary masterpiece with the world
-            </p>
+            <p className="text-slate-600">Update your recipe details</p>
           </div>
-          {onCancel && (
-            <button
-              onClick={onCancel}
-              className="p-3 hover:bg-white rounded-full transition-colors"
-              disabled={isSubmitting}
-            >
-              <ArrowLeft className="w-6 h-6 text-slate-600" />
-            </button>
-          )}
+          <button
+            onClick={() => router.push("/my-recipe")}
+            className="p-3 hover:bg-white rounded-full transition-colors"
+            disabled={isSubmitting}
+          >
+            <ArrowLeft className="w-6 h-6 text-slate-600" />
+          </button>
         </div>
 
         {errors.submit && (
@@ -487,31 +561,29 @@ const RecipeCreatePage: React.FC<RecipeCreatePageProps> = ({
           </Card>
 
           <div className="flex gap-4 justify-end">
-            {onCancel && (
-              <button
-                type="button"
-                onClick={onCancel}
-                disabled={isSubmitting}
-                className="px-6 py-3 text-slate-700 bg-white hover:bg-slate-50 rounded-lg font-semibold transition-colors shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Cancel
-              </button>
-            )}
             <button
               type="button"
-              onClick={createRecipe}
+              onClick={() => router.push("/my-recipe")}
+              disabled={isSubmitting}
+              className="px-6 py-3 text-slate-700 bg-white hover:bg-slate-50 rounded-lg font-semibold transition-colors shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={updateRecipe}
               disabled={isSubmitting}
               className="flex items-center gap-2 px-8 py-3 bg-slate-900 text-white rounded-lg font-semibold hover:bg-slate-800 transition-colors shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSubmitting ? (
                 <>
                   <Loader2 className="w-5 h-5 animate-spin" />
-                  Creating...
+                  Updating...
                 </>
               ) : (
                 <>
                   <Save className="w-5 h-5" />
-                  Create Recipe
+                  Update Recipe
                 </>
               )}
             </button>
@@ -522,4 +594,4 @@ const RecipeCreatePage: React.FC<RecipeCreatePageProps> = ({
   );
 };
 
-export default RecipeCreatePage;
+export default RecipeEditPage;
