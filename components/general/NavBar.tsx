@@ -26,7 +26,7 @@ const Navbar = async () => {
           </Link>
         </div>
         <div className="flex items-center gap-5">
-          <ThemeToggle />
+          {/* <ThemeToggle /> */}
 
           {session?.user ? (
             <UserDropdown
