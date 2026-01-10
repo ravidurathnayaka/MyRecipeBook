@@ -9,10 +9,12 @@ import {
   Trash2,
   Loader2,
   CheckCircle,
+  ChefHat,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 // Prisma enums and types
 enum Category {
@@ -63,6 +65,11 @@ const RecipeCreatePage: React.FC<RecipeCreatePageProps> = ({
   const [imagePreview, setImagePreview] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+
+  const router = useRouter();
+  const handleCreateRecipe = () => {
+    router.push("/");
+  };
 
   const updateField = (field: keyof RecipeFormData, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -226,6 +233,13 @@ const RecipeCreatePage: React.FC<RecipeCreatePageProps> = ({
             <p className="text-slate-600 mb-6">
               Your recipe has been successfully saved to the database.
             </p>
+            <button
+              onClick={handleCreateRecipe}
+              className="flex items-center mx-auto justify-center gap-2 px-6 py-3 bg-primary text-white rounded-lg font-semibold hover:bg-slate-800 transition-colors shadow-md"
+            >
+              <ChefHat className="w-5 h-5" />
+              Go Home
+            </button>
           </CardContent>
         </Card>
       </div>
