@@ -1,12 +1,13 @@
 import prisma from "@/app/utils/db";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
+// GET recipe
 export async function GET(
-  request: Request,
-  context: { params: Promise<{ id: string }> }
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = await context.params; // ✅ REQUIRED FIX
+    const { id } = await params;
 
     const recipe = await prisma.recipe.findUnique({
       where: { id },
@@ -41,16 +42,15 @@ export async function GET(
 
 // UPDATE recipe
 export async function PUT(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const body = await request.json();
 
     const recipe = await prisma.recipe.update({
-      where: {
-        id: params.id,
-      },
+      where: { id },
       data: {
         title: body.title,
         description: body.description,
@@ -85,14 +85,14 @@ export async function PUT(
 
 // DELETE recipe
 export async function DELETE(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
+
     await prisma.recipe.delete({
-      where: {
-        id: params.id,
-      },
+      where: { id },
     });
 
     return NextResponse.json(
