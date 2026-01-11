@@ -26,16 +26,16 @@ export function UserDropdown({ email, name, image }: iAppProps) {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="h-auto p-0 hover:bg-transparent">
-          <Avatar>
+          <Avatar className="w-10 h-10">
             <AvatarImage src={image} alt="Profile image" />
             <AvatarFallback>{name.charAt(0)}</AvatarFallback>
           </Avatar>
-          <ChevronDown
+          {/* <ChevronDown
             size={16}
             strokeWidth={2}
             className="ms-2 opacity-60"
             aria-hidden="true"
-          />
+          /> */}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-48 mt-3" align="end">
