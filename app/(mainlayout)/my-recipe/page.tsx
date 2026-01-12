@@ -74,7 +74,7 @@ const MyRecipesPage: React.FC = () => {
       console.log("User ID:", session?.user?.id);
 
       // Check if user ID exists
-      const userId = "cmk466xh20000awidg56vg4tf";
+      const userId = session?.user?.id;
       if (!userId) {
         console.error("No user ID found in session");
         setLoading(false);
@@ -107,7 +107,7 @@ const MyRecipesPage: React.FC = () => {
       filtered = filtered.filter(
         (recipe) =>
           recipe.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          recipe.description.toLowerCase().includes(searchQuery.toLowerCase())
+          recipe.description.toLowerCase().includes(searchQuery.toLowerCase()),
       );
     }
 
@@ -213,27 +213,27 @@ const MyRecipesPage: React.FC = () => {
   // Auth check
   if (status === "loading") {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center">
-        <Loader2 className="w-12 h-12 animate-spin text-slate-600" />
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100">
+        <Loader2 className="h-12 w-12 animate-spin text-slate-600" />
       </div>
     );
   }
 
   if (status === "unauthenticated") {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center px-4">
-        <Card className="max-w-md w-full shadow-xl border-0 text-center">
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 px-4">
+        <Card className="w-full max-w-md border-0 text-center shadow-xl">
           <CardContent className="pt-12 pb-8">
-            <AlertCircle className="w-16 h-16 text-red-600 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-slate-900 mb-3">
+            <AlertCircle className="mx-auto mb-4 h-16 w-16 text-red-600" />
+            <h2 className="mb-3 text-2xl font-bold text-slate-900">
               Authentication Required
             </h2>
-            <p className="text-slate-600 mb-6">
+            <p className="mb-6 text-slate-600">
               Please sign in to view your recipes.
             </p>
             <button
               onClick={() => router.push("/api/auth/signin")}
-              className="px-6 py-3 bg-slate-900 text-white rounded-lg font-semibold hover:bg-slate-800 transition-colors"
+              className="rounded-lg bg-slate-900 px-6 py-3 font-semibold text-white transition-colors hover:bg-slate-800"
             >
               Sign In
             </button>
@@ -245,18 +245,18 @@ const MyRecipesPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-2xl font-bold text-slate-900">My Recipes</h1>
-            <p className="text-slate-600 mt-1">Manage your recipe collection</p>
+            <p className="mt-1 text-slate-600">Manage your recipe collection</p>
           </div>
           <button
             onClick={handleCreateRecipe}
-            className="flex items-center justify-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-lg font-semibold hover:bg-slate-800 transition-colors shadow-md"
+            className="flex items-center justify-center gap-2 rounded-lg bg-slate-900 px-6 py-3 font-semibold text-white shadow-md transition-colors hover:bg-slate-800"
           >
-            <Plus className="w-5 h-5" />
+            <Plus className="h-5 w-5" />
             Create Recipe
           </button>
         </div>
@@ -264,13 +264,13 @@ const MyRecipesPage: React.FC = () => {
         {/* Search */}
         <div className="mb-6">
           <div className="relative">
-            <Search className="absolute right-2 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+            <Search className="absolute top-1/2 right-2 h-5 w-5 -translate-y-1/2 text-slate-400" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search your recipes..."
-              className="w-full px-2 py-3 rounded-lg border-2 border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+              className="w-full rounded-lg border-2 border-slate-200 bg-white px-2 py-3 focus:ring-2 focus:ring-blue-500 focus:outline-none"
             />
           </div>
         </div>
@@ -282,7 +282,7 @@ const MyRecipesPage: React.FC = () => {
               ? "Loading..."
               : `Showing ${startIndex + 1}-${Math.min(
                   endIndex,
-                  filteredRecipes.length
+                  filteredRecipes.length,
                 )} of ${filteredRecipes.length} recipes`}
           </span>
           {totalPages > 1 && (
@@ -295,21 +295,21 @@ const MyRecipesPage: React.FC = () => {
         {/* Loading */}
         {loading && (
           <div className="flex items-center justify-center py-20">
-            <Loader2 className="w-12 h-12 animate-spin text-slate-600" />
+            <Loader2 className="h-12 w-12 animate-spin text-slate-600" />
           </div>
         )}
 
         {/* Empty State */}
         {!loading && filteredRecipes.length === 0 && (
-          <Card className="shadow-lg border-0">
+          <Card className="border-0 shadow-lg">
             <CardContent className="py-20 text-center">
-              <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Search className="w-10 h-10 text-slate-400" />
+              <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-slate-100">
+                <Search className="h-10 w-10 text-slate-400" />
               </div>
-              <h3 className="text-2xl font-bold text-slate-900 mb-2">
+              <h3 className="mb-2 text-2xl font-bold text-slate-900">
                 No recipes found
               </h3>
-              <p className="text-slate-600 mb-6">
+              <p className="mb-6 text-slate-600">
                 {searchQuery
                   ? "Try adjusting your search query"
                   : "Start by creating your first recipe!"}
@@ -317,9 +317,9 @@ const MyRecipesPage: React.FC = () => {
               {!searchQuery && (
                 <button
                   onClick={handleCreateRecipe}
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-lg font-semibold hover:bg-slate-800 transition-colors"
+                  className="inline-flex items-center gap-2 rounded-lg bg-slate-900 px-6 py-3 font-semibold text-white transition-colors hover:bg-slate-800"
                 >
-                  <Plus className="w-5 h-5" />
+                  <Plus className="h-5 w-5" />
                   Create Recipe
                 </button>
               )}
@@ -331,10 +331,10 @@ const MyRecipesPage: React.FC = () => {
         {!loading && currentRecipes.length > 0 && (
           <>
             <div className="hidden md:block">
-              <Card className="shadow-lg border-0 overflow-hidden">
+              <Card className="overflow-hidden border-0 shadow-lg">
                 <div className="overflow-x-auto">
                   <table className="w-full">
-                    <thead className="bg-slate-50 border-b-2 border-slate-200">
+                    <thead className="border-b-2 border-slate-200 bg-slate-50">
                       <tr>
                         <th className="px-6 py-4 text-left text-sm font-semibold text-slate-700">
                           Recipe
@@ -357,7 +357,7 @@ const MyRecipesPage: React.FC = () => {
                       {currentRecipes.map((recipe) => (
                         <tr
                           key={recipe.id}
-                          className="hover:bg-slate-50 transition-colors"
+                          className="transition-colors hover:bg-slate-50"
                         >
                           <td className="px-6 py-4">
                             <div className="flex items-center gap-3">
@@ -365,14 +365,14 @@ const MyRecipesPage: React.FC = () => {
                                 <img
                                   src={recipe.imageUrl}
                                   alt={recipe.title}
-                                  className="w-12 h-12 rounded-lg object-cover"
+                                  className="h-12 w-12 rounded-lg object-cover"
                                 />
                               )}
                               <div>
                                 <p className="font-semibold text-slate-900">
                                   {recipe.title}
                                 </p>
-                                <p className="text-sm text-slate-500 line-clamp-1">
+                                <p className="line-clamp-1 text-sm text-slate-500">
                                   {recipe.description}
                                 </p>
                               </div>
@@ -395,28 +395,28 @@ const MyRecipesPage: React.FC = () => {
                             <div className="flex items-center justify-end gap-2">
                               <button
                                 onClick={() => handleView(recipe.id)}
-                                className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                className="rounded-lg p-2 text-blue-600 transition-colors hover:bg-blue-50"
                                 title="View"
                               >
-                                <Eye className="w-5 h-5" />
+                                <Eye className="h-5 w-5" />
                               </button>
                               <button
                                 onClick={() => handleEdit(recipe.id)}
-                                className="p-2 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
+                                className="rounded-lg p-2 text-emerald-600 transition-colors hover:bg-emerald-50"
                                 title="Edit"
                               >
-                                <Edit className="w-5 h-5" />
+                                <Edit className="h-5 w-5" />
                               </button>
                               <button
                                 onClick={() => handleDeleteClick(recipe)}
                                 disabled={deletingId === recipe.id}
-                                className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
+                                className="rounded-lg p-2 text-red-600 transition-colors hover:bg-red-50 disabled:opacity-50"
                                 title="Delete"
                               >
                                 {deletingId === recipe.id ? (
-                                  <Loader2 className="w-5 h-5 animate-spin" />
+                                  <Loader2 className="h-5 w-5 animate-spin" />
                                 ) : (
-                                  <Trash2 className="w-5 h-5" />
+                                  <Trash2 className="h-5 w-5" />
                                 )}
                               </button>
                             </div>
@@ -430,23 +430,23 @@ const MyRecipesPage: React.FC = () => {
             </div>
 
             {/* Mobile Cards */}
-            <div className="md:hidden space-y-4">
+            <div className="space-y-4 md:hidden">
               {currentRecipes.map((recipe) => (
-                <Card key={recipe.id} className="shadow-lg border-0">
+                <Card key={recipe.id} className="border-0 shadow-lg">
                   <CardContent className="p-4">
-                    <div className="flex gap-3 mb-3">
+                    <div className="mb-3 flex gap-3">
                       {recipe.imageUrl && (
                         <img
                           src={recipe.imageUrl}
                           alt={recipe.title}
-                          className="w-20 h-20 rounded-lg object-cover flex-shrink-0"
+                          className="h-20 w-20 flex-shrink-0 rounded-lg object-cover"
                         />
                       )}
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-bold text-slate-900 mb-1">
+                      <div className="min-w-0 flex-1">
+                        <h3 className="mb-1 font-bold text-slate-900">
                           {recipe.title}
                         </h3>
-                        <p className="text-sm text-slate-500 line-clamp-2 mb-2">
+                        <p className="mb-2 line-clamp-2 text-sm text-slate-500">
                           {recipe.description}
                         </p>
                         <Badge className={getCategoryColor(recipe.category)}>
@@ -454,32 +454,32 @@ const MyRecipesPage: React.FC = () => {
                         </Badge>
                       </div>
                     </div>
-                    <div className="flex items-center justify-between pt-3 border-t border-slate-200">
+                    <div className="flex items-center justify-between border-t border-slate-200 pt-3">
                       <div className="text-sm text-slate-600">
                         {formatDate(recipe.createdAt)}
                       </div>
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => handleView(recipe.id)}
-                          className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                          className="rounded-lg p-2 text-blue-600 transition-colors hover:bg-blue-50"
                         >
-                          <Eye className="w-5 h-5" />
+                          <Eye className="h-5 w-5" />
                         </button>
                         <button
                           onClick={() => handleEdit(recipe.id)}
-                          className="p-2 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
+                          className="rounded-lg p-2 text-emerald-600 transition-colors hover:bg-emerald-50"
                         >
-                          <Edit className="w-5 h-5" />
+                          <Edit className="h-5 w-5" />
                         </button>
                         <button
                           onClick={() => handleDeleteClick(recipe)}
                           disabled={deletingId === recipe.id}
-                          className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                          className="rounded-lg p-2 text-red-600 transition-colors hover:bg-red-50"
                         >
                           {deletingId === recipe.id ? (
-                            <Loader2 className="w-5 h-5 animate-spin" />
+                            <Loader2 className="h-5 w-5 animate-spin" />
                           ) : (
-                            <Trash2 className="w-5 h-5" />
+                            <Trash2 className="h-5 w-5" />
                           )}
                         </button>
                       </div>
@@ -491,13 +491,13 @@ const MyRecipesPage: React.FC = () => {
 
             {/* Pagination */}
             {totalPages > 1 && (
-              <div className="flex items-center justify-center gap-2">
+              <div className="mt-10 flex items-center justify-center gap-2">
                 <button
                   onClick={() => goToPage(currentPage - 1)}
                   disabled={currentPage === 1}
-                  className="p-2 rounded-lg border-2 border-slate-200 hover:border-slate-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors bg-white"
+                  className="rounded-lg border-2 border-slate-200 bg-white p-2 transition-colors hover:border-slate-300 disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  <ChevronLeft className="w-5 h-5 text-slate-600" />
+                  <ChevronLeft className="h-5 w-5 text-slate-600" />
                 </button>
 
                 {getPageNumbers().map((page, index) =>
@@ -505,10 +505,10 @@ const MyRecipesPage: React.FC = () => {
                     <button
                       key={index}
                       onClick={() => goToPage(page)}
-                      className={`min-w-[40px] h-10 w-10 rounded-lg border-2 font-semibold transition-colors ${
+                      className={`h-10 w-10 min-w-[40px] rounded-lg border-2 font-semibold transition-colors ${
                         currentPage === page
-                          ? "bg-slate-900 text-white border-slate-900"
-                          : "bg-white text-slate-700 border-slate-200 hover:border-slate-300"
+                          ? "border-slate-900 bg-slate-900 text-white"
+                          : "border-slate-200 bg-white text-slate-700 hover:border-slate-300"
                       }`}
                     >
                       {page}
@@ -517,15 +517,15 @@ const MyRecipesPage: React.FC = () => {
                     <span key={index} className="px-2 text-slate-400">
                       {page}
                     </span>
-                  )
+                  ),
                 )}
 
                 <button
                   onClick={() => goToPage(currentPage + 1)}
                   disabled={currentPage === totalPages}
-                  className="p-2 rounded-lg border-2 border-slate-200 hover:border-slate-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors bg-white"
+                  className="rounded-lg border-2 border-slate-200 bg-white p-2 transition-colors hover:border-slate-300 disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  <ChevronRight className="w-5 h-5 text-slate-600" />
+                  <ChevronRight className="h-5 w-5 text-slate-600" />
                 </button>
               </div>
             )}
@@ -535,15 +535,15 @@ const MyRecipesPage: React.FC = () => {
 
       {/* Delete Confirmation Modal */}
       {showDeleteModal && recipeToDelete && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <Card className="max-w-md w-full shadow-2xl border-0">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <Card className="w-full max-w-md border-0 shadow-2xl">
             <CardContent className="p-6">
-              <div className="flex items-start gap-4 mb-4">
-                <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <AlertCircle className="w-6 h-6 text-red-600" />
+              <div className="mb-4 flex items-start gap-4">
+                <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100">
+                  <AlertCircle className="h-6 w-6 text-red-600" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-slate-900 mb-2">
+                  <h3 className="mb-2 text-xl font-bold text-slate-900">
                     Delete Recipe
                   </h3>
                   <p className="text-slate-600">
@@ -555,25 +555,25 @@ const MyRecipesPage: React.FC = () => {
                   </p>
                 </div>
               </div>
-              <div className="flex gap-3 justify-end">
+              <div className="flex justify-end gap-3">
                 <button
                   onClick={() => {
                     setShowDeleteModal(false);
                     setRecipeToDelete(null);
                   }}
                   disabled={deletingId !== null}
-                  className="px-4 py-2 text-slate-700 hover:bg-slate-100 rounded-lg font-semibold transition-colors"
+                  className="rounded-lg px-4 py-2 font-semibold text-slate-700 transition-colors hover:bg-slate-100"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleDeleteConfirm}
                   disabled={deletingId !== null}
-                  className="px-4 py-2 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition-colors disabled:opacity-50 flex items-center gap-2"
+                  className="flex items-center gap-2 rounded-lg bg-red-600 px-4 py-2 font-semibold text-white transition-colors hover:bg-red-700 disabled:opacity-50"
                 >
                   {deletingId ? (
                     <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <Loader2 className="h-4 w-4 animate-spin" />
                       Deleting...
                     </>
                   ) : (

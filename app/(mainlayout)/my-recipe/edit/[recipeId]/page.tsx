@@ -41,6 +41,8 @@ const RecipeEditPage: React.FC = () => {
   const params = useParams();
   const recipeId = params?.recipeId as string;
 
+  console.log(recipeId);
+
   const [formData, setFormData] = useState<RecipeFormData>({
     title: "",
     description: "",
@@ -103,7 +105,7 @@ const RecipeEditPage: React.FC = () => {
     } catch (error) {
       console.error("Error fetching recipe:", error);
       setLoadError(
-        error instanceof Error ? error.message : "Failed to load recipe"
+        error instanceof Error ? error.message : "Failed to load recipe",
       );
     } finally {
       setIsLoading(false);
@@ -257,9 +259,9 @@ const RecipeEditPage: React.FC = () => {
   // Loading state
   if (isLoading || status === "loading") {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100">
         <div className="text-center">
-          <Loader2 className="w-12 h-12 animate-spin text-slate-600 mx-auto mb-4" />
+          <Loader2 className="mx-auto mb-4 h-12 w-12 animate-spin text-slate-600" />
           <p className="text-slate-600">Loading recipe...</p>
         </div>
       </div>
@@ -269,17 +271,17 @@ const RecipeEditPage: React.FC = () => {
   // Error state
   if (loadError) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center px-4">
-        <Card className="max-w-md w-full shadow-xl border-0 text-center">
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 px-4">
+        <Card className="w-full max-w-md border-0 text-center shadow-xl">
           <CardContent className="pt-12 pb-8">
-            <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <ArrowLeft className="w-12 h-12 text-red-600" />
+            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-red-100">
+              <ArrowLeft className="h-12 w-12 text-red-600" />
             </div>
-            <h2 className="text-3xl font-bold text-slate-900 mb-3">Error</h2>
-            <p className="text-slate-600 mb-6">{loadError}</p>
+            <h2 className="mb-3 text-3xl font-bold text-slate-900">Error</h2>
+            <p className="mb-6 text-slate-600">{loadError}</p>
             <button
               onClick={() => router.push("/my-recipe")}
-              className="px-6 py-3 bg-slate-900 text-white rounded-lg font-semibold hover:bg-slate-800 transition-colors"
+              className="rounded-lg bg-slate-900 px-6 py-3 font-semibold text-white transition-colors hover:bg-slate-800"
             >
               Back to My Recipes
             </button>
@@ -292,16 +294,16 @@ const RecipeEditPage: React.FC = () => {
   // Success state
   if (submitSuccess) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center px-4">
-        <Card className="max-w-md w-full shadow-xl border-0 text-center">
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 px-4">
+        <Card className="w-full max-w-md border-0 text-center shadow-xl">
           <CardContent className="pt-12 pb-8">
-            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <CheckCircle className="w-12 h-12 text-green-600" />
+            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-green-100">
+              <CheckCircle className="h-12 w-12 text-green-600" />
             </div>
-            <h2 className="text-3xl font-bold text-slate-900 mb-3">
+            <h2 className="mb-3 text-3xl font-bold text-slate-900">
               Recipe Updated!
             </h2>
-            <p className="text-slate-600 mb-6">
+            <p className="mb-6 text-slate-600">
               Your recipe has been successfully updated.
             </p>
           </CardContent>
@@ -311,38 +313,38 @@ const RecipeEditPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-8 px-4">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 px-4 py-8">
+      <div className="mx-auto max-w-4xl">
         <div className="mb-8 flex items-center justify-between">
           <div>
-            <h1 className="text-4xl font-bold text-slate-900 mb-2">
+            <h1 className="mb-2 text-4xl font-bold text-slate-900">
               Edit Recipe
             </h1>
             <p className="text-slate-600">Update your recipe details</p>
           </div>
           <button
             onClick={() => router.push("/my-recipe")}
-            className="p-3 hover:bg-white rounded-full transition-colors"
+            className="rounded-full p-3 transition-colors hover:bg-white"
             disabled={isSubmitting}
           >
-            <ArrowLeft className="w-6 h-6 text-slate-600" />
+            <ArrowLeft className="h-6 w-6 text-slate-600" />
           </button>
         </div>
 
         {errors.submit && (
-          <div className="mb-6 p-4 bg-red-50 border-2 border-red-200 rounded-lg">
-            <p className="text-red-800 font-medium">{errors.submit}</p>
+          <div className="mb-6 rounded-lg border-2 border-red-200 bg-red-50 p-4">
+            <p className="font-medium text-red-800">{errors.submit}</p>
           </div>
         )}
 
         <div className="space-y-6">
-          <Card className="shadow-lg border-0">
+          <Card className="border-0 shadow-lg">
             <CardHeader>
               <CardTitle className="text-2xl">Basic Information</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">
+                <label className="mb-2 block text-sm font-semibold text-slate-700">
                   Recipe Title *
                 </label>
                 <input
@@ -351,7 +353,7 @@ const RecipeEditPage: React.FC = () => {
                   onChange={(e) => updateField("title", e.target.value)}
                   placeholder="e.g., Homemade Margherita Pizza"
                   disabled={isSubmitting}
-                  className={`w-full px-4 py-3 rounded-lg border-2 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-slate-100 disabled:cursor-not-allowed ${
+                  className={`w-full rounded-lg border-2 px-4 py-3 transition-colors focus:ring-2 focus:ring-blue-500 focus:outline-none disabled:cursor-not-allowed disabled:bg-slate-100 ${
                     errors.title ? "border-red-300" : "border-slate-200"
                   }`}
                 />
@@ -361,7 +363,7 @@ const RecipeEditPage: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">
+                <label className="mb-2 block text-sm font-semibold text-slate-700">
                   Description *
                 </label>
                 <textarea
@@ -370,7 +372,7 @@ const RecipeEditPage: React.FC = () => {
                   placeholder="Describe your recipe in a few sentences..."
                   rows={3}
                   disabled={isSubmitting}
-                  className={`w-full px-4 py-3 rounded-lg border-2 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none disabled:bg-slate-100 disabled:cursor-not-allowed ${
+                  className={`w-full resize-none rounded-lg border-2 px-4 py-3 transition-colors focus:ring-2 focus:ring-blue-500 focus:outline-none disabled:cursor-not-allowed disabled:bg-slate-100 ${
                     errors.description ? "border-red-300" : "border-slate-200"
                   }`}
                 />
@@ -381,9 +383,9 @@ const RecipeEditPage: React.FC = () => {
                 )}
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-2">
+                  <label className="mb-2 block text-sm font-semibold text-slate-700">
                     Category *
                   </label>
                   <div className="flex flex-wrap gap-2">
@@ -391,11 +393,11 @@ const RecipeEditPage: React.FC = () => {
                       <Badge
                         key={cat}
                         className={`cursor-pointer border-2 transition-all ${
-                          isSubmitting ? "opacity-50 cursor-not-allowed" : ""
+                          isSubmitting ? "cursor-not-allowed opacity-50" : ""
                         } ${
                           formData.category === cat
                             ? getCategoryColor(cat)
-                            : "bg-slate-100 text-slate-600 border-slate-200 hover:border-slate-300"
+                            : "border-slate-200 bg-slate-100 text-slate-600 hover:border-slate-300"
                         }`}
                         onClick={() =>
                           !isSubmitting && updateField("category", cat)
@@ -408,7 +410,7 @@ const RecipeEditPage: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-2">
+                  <label className="mb-2 block text-sm font-semibold text-slate-700">
                     Prep Time (minutes)
                   </label>
                   <input
@@ -418,7 +420,7 @@ const RecipeEditPage: React.FC = () => {
                     placeholder="30"
                     min="0"
                     disabled={isSubmitting}
-                    className={`w-full px-4 py-3 rounded-lg border-2 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-slate-100 disabled:cursor-not-allowed ${
+                    className={`w-full rounded-lg border-2 px-4 py-3 transition-colors focus:ring-2 focus:ring-blue-500 focus:outline-none disabled:cursor-not-allowed disabled:bg-slate-100 ${
                       errors.makeTime ? "border-red-300" : "border-slate-200"
                     }`}
                   />
@@ -431,19 +433,19 @@ const RecipeEditPage: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">
+                <label className="mb-2 block text-sm font-semibold text-slate-700">
                   Image URL
                 </label>
                 <div className="flex gap-2">
                   <div className="relative flex-1">
-                    <Upload className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                    <Upload className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 text-slate-400" />
                     <input
                       type="url"
                       value={formData.imageUrl}
                       onChange={(e) => handleImageUrlChange(e.target.value)}
                       placeholder="https://example.com/image.jpg"
                       disabled={isSubmitting}
-                      className="w-full pl-11 pr-4 py-3 rounded-lg border-2 border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-slate-100 disabled:cursor-not-allowed"
+                      className="w-full rounded-lg border-2 border-slate-200 py-3 pr-4 pl-11 focus:ring-2 focus:ring-blue-500 focus:outline-none disabled:cursor-not-allowed disabled:bg-slate-100"
                     />
                   </div>
                 </div>
@@ -452,7 +454,7 @@ const RecipeEditPage: React.FC = () => {
                     <img
                       src={imagePreview}
                       alt="Preview"
-                      className="w-full h-48 object-cover rounded-lg"
+                      className="h-48 w-full rounded-lg object-cover"
                       onError={() => setImagePreview("")}
                     />
                   </div>
@@ -461,7 +463,7 @@ const RecipeEditPage: React.FC = () => {
             </CardContent>
           </Card>
 
-          <Card className="shadow-lg border-0">
+          <Card className="border-0 shadow-lg">
             <CardHeader>
               <CardTitle className="text-2xl">Ingredients</CardTitle>
             </CardHeader>
@@ -474,15 +476,15 @@ const RecipeEditPage: React.FC = () => {
                     onChange={(e) => updateIngredient(index, e.target.value)}
                     placeholder={`Ingredient ${index + 1}`}
                     disabled={isSubmitting}
-                    className="flex-1 px-4 py-3 rounded-lg border-2 border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-slate-100 disabled:cursor-not-allowed"
+                    className="flex-1 rounded-lg border-2 border-slate-200 px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:outline-none disabled:cursor-not-allowed disabled:bg-slate-100"
                   />
                   <button
                     type="button"
                     onClick={() => removeIngredient(index)}
-                    className="p-3 text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="rounded-lg p-3 text-red-600 transition-colors hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
                     disabled={formData.ingredients.length === 1 || isSubmitting}
                   >
-                    <Trash2 className="w-5 h-5" />
+                    <Trash2 className="h-5 w-5" />
                   </button>
                 </div>
               ))}
@@ -493,22 +495,22 @@ const RecipeEditPage: React.FC = () => {
                 type="button"
                 onClick={addIngredient}
                 disabled={isSubmitting}
-                className="flex items-center gap-2 px-4 py-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center gap-2 rounded-lg px-4 py-2 font-medium text-blue-600 transition-colors hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-50"
               >
-                <Plus className="w-5 h-5" />
+                <Plus className="h-5 w-5" />
                 Add Ingredient
               </button>
             </CardContent>
           </Card>
 
-          <Card className="shadow-lg border-0">
+          <Card className="border-0 shadow-lg">
             <CardHeader>
               <CardTitle className="text-2xl">Instructions</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               {formData.steps.map((step, index) => (
                 <div key={index} className="flex gap-2">
-                  <div className="flex-shrink-0 w-8 h-8 bg-slate-900 text-white rounded-full flex items-center justify-center font-bold mt-2">
+                  <div className="mt-2 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-slate-900 font-bold text-white">
                     {index + 1}
                   </div>
                   <textarea
@@ -517,15 +519,15 @@ const RecipeEditPage: React.FC = () => {
                     placeholder={`Step ${index + 1} instructions...`}
                     rows={2}
                     disabled={isSubmitting}
-                    className="flex-1 px-4 py-3 rounded-lg border-2 border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none disabled:bg-slate-100 disabled:cursor-not-allowed"
+                    className="flex-1 resize-none rounded-lg border-2 border-slate-200 px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:outline-none disabled:cursor-not-allowed disabled:bg-slate-100"
                   />
                   <button
                     type="button"
                     onClick={() => removeStep(index)}
-                    className="p-3 text-red-600 hover:bg-red-50 rounded-lg transition-colors self-start disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="self-start rounded-lg p-3 text-red-600 transition-colors hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
                     disabled={formData.steps.length === 1 || isSubmitting}
                   >
-                    <Trash2 className="w-5 h-5" />
+                    <Trash2 className="h-5 w-5" />
                   </button>
                 </div>
               ))}
@@ -536,15 +538,15 @@ const RecipeEditPage: React.FC = () => {
                 type="button"
                 onClick={addStep}
                 disabled={isSubmitting}
-                className="flex items-center gap-2 px-4 py-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center gap-2 rounded-lg px-4 py-2 font-medium text-blue-600 transition-colors hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-50"
               >
-                <Plus className="w-5 h-5" />
+                <Plus className="h-5 w-5" />
                 Add Step
               </button>
             </CardContent>
           </Card>
 
-          <Card className="shadow-lg border-0">
+          <Card className="border-0 shadow-lg">
             <CardHeader>
               <CardTitle className="text-2xl">Pro Tips (Optional)</CardTitle>
             </CardHeader>
@@ -555,17 +557,17 @@ const RecipeEditPage: React.FC = () => {
                 placeholder="Share your expert tips and tricks for making this recipe perfect..."
                 rows={4}
                 disabled={isSubmitting}
-                className="w-full px-4 py-3 rounded-lg border-2 border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none disabled:bg-slate-100 disabled:cursor-not-allowed"
+                className="w-full resize-none rounded-lg border-2 border-slate-200 px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:outline-none disabled:cursor-not-allowed disabled:bg-slate-100"
               />
             </CardContent>
           </Card>
 
-          <div className="flex gap-4 justify-end">
+          <div className="flex justify-end gap-4">
             <button
               type="button"
               onClick={() => router.push("/my-recipe")}
               disabled={isSubmitting}
-              className="px-6 py-3 text-slate-700 bg-white hover:bg-slate-50 rounded-lg font-semibold transition-colors shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+              className="rounded-lg bg-white px-6 py-3 font-semibold text-slate-700 shadow-md transition-colors hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
             >
               Cancel
             </button>
@@ -573,16 +575,16 @@ const RecipeEditPage: React.FC = () => {
               type="button"
               onClick={updateRecipe}
               disabled={isSubmitting}
-              className="flex items-center gap-2 px-8 py-3 bg-slate-900 text-white rounded-lg font-semibold hover:bg-slate-800 transition-colors shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-center gap-2 rounded-lg bg-slate-900 px-8 py-3 font-semibold text-white shadow-md transition-colors hover:bg-slate-800 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50"
             >
               {isSubmitting ? (
                 <>
-                  <Loader2 className="w-5 h-5 animate-spin" />
+                  <Loader2 className="h-5 w-5 animate-spin" />
                   Updating...
                 </>
               ) : (
                 <>
-                  <Save className="w-5 h-5" />
+                  <Save className="h-5 w-5" />
                   Update Recipe
                 </>
               )}
