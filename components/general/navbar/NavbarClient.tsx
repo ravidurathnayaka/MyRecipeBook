@@ -1,6 +1,6 @@
 "use client";
 
-import { BookOpen, ChefHat, Info, Plus, Menu, X } from "lucide-react";
+import { BookOpen, ChefHat, Info, Plus, Menu, X, Home } from "lucide-react";
 import Link from "next/link";
 import { buttonVariants } from "../../ui/button";
 import { UserDropdown } from "../UserDropdown";
@@ -13,7 +13,7 @@ const NavBarClient = ({ session }: { session: any }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const isActive = pathname === "/my-recipe";
-  const isActiveAbout = pathname === "/about";
+  const isActiveAbout = pathname === "/";
 
   // Close mobile menu when route changes
   useEffect(() => {
@@ -34,16 +34,16 @@ const NavBarClient = ({ session }: { session: any }) => {
 
   const navLinks = [
     {
+      href: "/",
+      label: "Home",
+      icon: Home,
+      isActive: isActiveAbout,
+    },
+    {
       href: "/my-recipe",
       label: "My Recipes",
       icon: BookOpen,
       isActive: isActive,
-    },
-    {
-      href: "/about",
-      label: "About",
-      icon: Info,
-      isActive: isActiveAbout,
     },
   ];
 
@@ -89,25 +89,26 @@ const NavBarClient = ({ session }: { session: any }) => {
 
             {/* Desktop Actions */}
             <div className="hidden items-center gap-3 md:flex">
-              <Link
-                href="/create-recipe"
-                className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-2 rounded-lg px-4 py-2 font-semibold shadow-md transition-all hover:shadow-lg"
-              >
-                <Plus className="h-5 w-5" />
-                <span className="hidden lg:inline">Add Recipe</span>
-              </Link>
               {session?.user ? (
-                <UserDropdown
-                  email={session.user.email as string}
-                  name={session.user.name as string}
-                  image={session.user.image as string}
-                />
+                <div className="flex place-content-center gap-5">
+                  <Link
+                    href="/create-recipe"
+                    className="inline-flex h-10 w-10 items-center justify-center gap-2 rounded-md bg-slate-900 font-semibold text-white transition-colors hover:bg-slate-800"
+                  >
+                    <Plus className="flex h-5 w-5" />
+                  </Link>
+                  <UserDropdown
+                    email={session.user.email as string}
+                    name={session.user.name as string}
+                    image={session.user.image as string}
+                  />
+                </div>
               ) : (
                 <Link
                   href="/login"
-                  className={buttonVariants({ variant: "outline" })}
+                  className="hover inline-flex items-center gap-2 rounded-lg border-2 px-6 py-3 font-semibold transition-colors hover:bg-slate-800 hover:text-white"
                 >
-                  Login
+                  <span className="hidden lg:inline">Login</span>
                 </Link>
               )}
             </div>

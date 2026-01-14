@@ -49,7 +49,7 @@ const RecipeCard: React.FC<{ recipe: Recipe; onClick: () => void }> = ({
     return colors[category];
   };
   return (
-    <Card className="w-full max-w-sm overflow-hidden hover:shadow-xl transition-all duration-300 border-0 shadow-md group flex flex-col self-center mx-auto pt-0">
+    <Card className="group mx-auto flex h-full w-full max-w-sm flex-col self-center overflow-hidden border-0 pt-0 shadow-md transition-all duration-300 hover:shadow-xl">
       <div className="relative overflow-hidden">
         <img
           src={
@@ -57,20 +57,20 @@ const RecipeCard: React.FC<{ recipe: Recipe; onClick: () => void }> = ({
             "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=80"
           }
           alt={recipe.title}
-          className="w-full h-56 object-cover transition-transform duration-500 group-hover:scale-110"
+          className="h-56 w-full object-cover transition-transform duration-500 group-hover:scale-110"
         />
         <div className="absolute top-3 left-3">
           <Badge
             className={`${getCategoryColor(
-              recipe.category
+              recipe.category,
             )} border-0 shadow-sm`}
           >
             {recipe.category}
           </Badge>
         </div>
         {recipe.makeTime && (
-          <div className="absolute top-3 right-3 bg-white/95 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-md flex items-center gap-1.5">
-            <Clock className="w-4 h-4 text-slate-600" />
+          <div className="absolute top-3 right-3 flex items-center gap-1.5 rounded-full bg-white/95 px-3 py-1.5 shadow-md backdrop-blur-sm">
+            <Clock className="h-4 w-4 text-slate-600" />
             <span className="text-sm font-medium text-slate-700">
               {recipe.makeTime} min
             </span>
@@ -79,33 +79,33 @@ const RecipeCard: React.FC<{ recipe: Recipe; onClick: () => void }> = ({
       </div>
 
       <CardHeader className="pb-3">
-        <h3 className="text-xl font-bold text-slate-900 line-clamp-2 group-hover:text-blue-600 transition-colors">
+        <h3 className="line-clamp-2 text-xl font-bold text-slate-900 transition-colors group-hover:text-blue-600">
           {recipe.title}
         </h3>
       </CardHeader>
 
       <CardContent className="pb-4">
-        <p className="text-slate-600 text-sm line-clamp-2 leading-relaxed">
+        <p className="line-clamp-2 text-sm leading-relaxed text-slate-600">
           {recipe.description}
         </p>
       </CardContent>
 
-      <CardFooter className="pt-0 flex items-center justify-between border-t border-slate-100 pt-4">
+      <CardFooter className="flex items-center justify-between border-t border-slate-100 pt-0 pt-4">
         <div className="flex items-center gap-2 text-slate-600">
           {recipe.author ? (
             <>
-              <User className="w-4 h-4" />
+              <User className="h-4 w-4" />
               <span className="text-sm font-medium">{recipe.author.name}</span>
             </>
           ) : (
             <>
-              <ChefHat className="w-4 h-4" />
+              <ChefHat className="h-4 w-4" />
               <span className="text-sm font-medium">Anonymous</span>
             </>
           )}
         </div>
         <Link href={`/recipe/${recipe.id}`}>
-          <button className="px-4 py-2 cursor-pointer bg-slate-900 text-white text-sm font-medium rounded-lg hover:bg-slate-800 transition-colors shadow-sm hover:shadow-md">
+          <button className="cursor-pointer rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-slate-800 hover:shadow-md">
             View Recipe
           </button>
         </Link>

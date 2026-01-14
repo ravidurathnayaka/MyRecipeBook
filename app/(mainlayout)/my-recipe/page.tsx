@@ -331,10 +331,10 @@ const MyRecipesPage: React.FC = () => {
         {!loading && currentRecipes.length > 0 && (
           <>
             <div className="hidden md:block">
-              <Card className="overflow-hidden border-0 shadow-lg">
+              <Card className="overflow-hidden border-0 py-0 shadow-lg">
                 <div className="overflow-x-auto">
                   <table className="w-full">
-                    <thead className="border-b-2 border-slate-200 bg-slate-50">
+                    <thead className="border-slate-150 border-b-2 bg-slate-200">
                       <tr>
                         <th className="px-6 py-4 text-left text-sm font-semibold text-slate-700">
                           Recipe
