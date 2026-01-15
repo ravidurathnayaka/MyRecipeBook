@@ -13,7 +13,7 @@ const NavBarClient = ({ session }: { session: any }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const isActive = pathname === "/my-recipe";
-  const isActiveAbout = pathname === "/";
+  const isActiveHome = pathname === "/";
 
   // Close mobile menu when route changes
   useEffect(() => {
@@ -37,7 +37,7 @@ const NavBarClient = ({ session }: { session: any }) => {
       href: "/",
       label: "Home",
       icon: Home,
-      isActive: isActiveAbout,
+      isActive: isActiveHome,
     },
     {
       href: "/my-recipe",
