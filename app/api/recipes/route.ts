@@ -1,9 +1,12 @@
+import { auth } from "@/app/utils/auth";
 import prisma from "@/app/utils/db";
 import { NextResponse } from "next/server";
 
 // GET all recipes
 export async function GET(request: Request) {
   try {
+    const session = await auth();
+
     const { searchParams } = new URL(request.url);
     const category = searchParams.get("category");
     const authorId = searchParams.get("authorId");
@@ -11,6 +14,11 @@ export async function GET(request: Request) {
 
     // Build where clause based on query parameters
     const where: any = {};
+
+    // Super admins see all recipes, users only see approved
+    if (session?.user?.role !== "SUPER_ADMIN") {
+      where.status = "APPROVED";
+    }
 
     if (category) {
       where.category = category;
@@ -49,7 +57,7 @@ export async function GET(request: Request) {
     console.error("Error fetching recipes:", error);
     return NextResponse.json(
       { message: "Failed to fetch recipes" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -57,6 +65,12 @@ export async function GET(request: Request) {
 // Create a recipe
 export async function POST(request: Request) {
   try {
+    const session = await auth();
+
+    if (!session?.user?.id) {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
+
     const body = await request.json();
 
     const recipe = await prisma.recipe.create({
@@ -70,6 +84,17 @@ export async function POST(request: Request) {
         category: body.category,
         imageUrl: body.imageUrl,
         authorId: body.authorId,
+        status: "PENDING",
+      },
+      include: {
+        author: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            image: true,
+          },
+        },
       },
     });
 
@@ -78,7 +103,7 @@ export async function POST(request: Request) {
     console.error("Error creating recipe:", error);
     return NextResponse.json(
       { message: "Failed to create recipe" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

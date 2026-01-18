@@ -52,39 +52,41 @@ const NavBarClient = ({ session }: { session: any }) => {
       <nav className="bg-background/95 supports-backdrop-filter:bg-background/60 sticky top-0 z-50 border-b-2 py-1 backdrop-blur">
         <div className="mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
-            {/* Logo */}
-            <Link href="/" className="flex shrink-0 items-center gap-2">
-              <ChefHat className="text-primary h-8 w-8 sm:h-10 sm:w-10" />
-              <h1 className="text-xl font-bold sm:text-2xl">RecipeBook</h1>
-            </Link>
+            <div className="flex gap-5">
+              {/* Logo */}
+              <Link href="/" className="flex shrink-0 items-center gap-2">
+                <ChefHat className="text-primary h-8 w-8 sm:h-10 sm:w-10" />
+                <h1 className="text-xl font-bold sm:text-2xl">RecipeBook</h1>
+              </Link>
 
-            {/* Desktop Navigation */}
-            <div className="hidden items-center gap-2 md:flex lg:gap-4">
-              {navLinks.map((link) => {
-                const Icon = link.icon;
-                return (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    className={clsx(
-                      "group flex items-center gap-2 rounded-full px-4 py-2 font-semibold transition-all duration-300",
-                      "hover:bg-primary/10 hover:text-primary",
-                      link.isActive
-                        ? "bg-primary text-white shadow-md"
-                        : "text-foreground/70",
-                    )}
-                    aria-current={link.isActive ? "page" : undefined}
-                  >
-                    <Icon
+              {/* Desktop Navigation */}
+              <div className="hidden items-center gap-2 md:flex lg:gap-4">
+                {navLinks.map((link) => {
+                  const Icon = link.icon;
+                  return (
+                    <Link
+                      key={link.href}
+                      href={link.href}
                       className={clsx(
-                        "h-5 w-5 transition-transform duration-300",
-                        link.isActive ? "scale-110" : "group-hover:scale-110",
+                        "group flex items-center gap-2 rounded-full px-4 py-2 font-semibold transition-all duration-300",
+                        "hover:bg-primary/10 hover:text-primary",
+                        link.isActive
+                          ? "bg-primary text-white shadow-md"
+                          : "text-foreground/70",
                       )}
-                    />
-                    <span className="hidden lg:inline">{link.label}</span>
-                  </Link>
-                );
-              })}
+                      aria-current={link.isActive ? "page" : undefined}
+                    >
+                      <Icon
+                        className={clsx(
+                          "h-5 w-5 transition-transform duration-300",
+                          link.isActive ? "scale-110" : "group-hover:scale-110",
+                        )}
+                      />
+                      <span className="hidden lg:inline">{link.label}</span>
+                    </Link>
+                  );
+                })}
+              </div>
             </div>
 
             {/* Desktop Actions */}

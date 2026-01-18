@@ -51,8 +51,13 @@ enum Category {
 
 enum UserRole {
   USER
-  ADMIN
   SUPER_ADMIN
+}
+
+enum RecipeStatus {
+  PENDING
+  APPROVED
+  REJECTED
 }
 
 model User {
@@ -79,6 +84,7 @@ model Recipe {
   tips          String? 
   category      Category
   imageUrl      String?
+  status        RecipeStatus  @default(PENDING)
   author        User?    @relation(fields: [authorId], references: [id])
   authorId      String?
   createdAt     DateTime @default(now())
