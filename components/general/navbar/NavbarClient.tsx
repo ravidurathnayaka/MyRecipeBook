@@ -1,6 +1,16 @@
 "use client";
 
-import { BookOpen, ChefHat, Info, Plus, Menu, X, Home } from "lucide-react";
+import {
+  BookOpen,
+  ChefHat,
+  Info,
+  Plus,
+  Menu,
+  X,
+  Home,
+  User,
+  Settings,
+} from "lucide-react";
 import Link from "next/link";
 import { buttonVariants } from "../../ui/button";
 import { UserDropdown } from "../UserDropdown";
@@ -14,6 +24,8 @@ const NavBarClient = ({ session }: { session: any }) => {
 
   const isActive = pathname === "/my-recipe";
   const isActiveHome = pathname === "/";
+  const isActiveUser = pathname === "/user";
+  const isActiveProfile = pathname === "/profile";
 
   // Close mobile menu when route changes
   useEffect(() => {
@@ -41,9 +53,22 @@ const NavBarClient = ({ session }: { session: any }) => {
     },
     {
       href: "/my-recipe",
-      label: "My Recipes",
+      label: "MyRecipes",
       icon: BookOpen,
       isActive: isActive,
+    },
+    {
+      href: "/users",
+      label: "User",
+      icon: User,
+      isActive: isActiveUser,
+    },
+
+    {
+      href: "/profile",
+      label: "Profile",
+      icon: Settings,
+      isActive: isActiveProfile,
     },
   ];
 
