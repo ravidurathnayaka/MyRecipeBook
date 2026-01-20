@@ -10,11 +10,15 @@ import {
   Home,
   User,
   Settings,
+  Shield,
+  Heart,
 } from "lucide-react";
 import Link from "next/link";
 import { buttonVariants } from "../../ui/button";
 import { UserDropdown } from "../UserDropdown";
+import { ThemeToggle } from "../ThemeToggle";
 import { usePathname } from "next/navigation";
+import { signOut } from "next-auth/react";
 import clsx from "clsx";
 import { useState, useEffect } from "react";
 
@@ -24,8 +28,6 @@ const NavBarClient = ({ session }: { session: any }) => {
 
   const isActive = pathname === "/my-recipe";
   const isActiveHome = pathname === "/";
-  const isActiveUser = pathname === "/user";
-  const isActiveProfile = pathname === "/profile";
 
   // Close mobile menu when route changes
   useEffect(() => {
@@ -44,6 +46,11 @@ const NavBarClient = ({ session }: { session: any }) => {
     };
   }, [mobileMenuOpen]);
 
+  const isAdmin = session?.user?.role === "SUPER_ADMIN";
+  const isActiveAdmin = pathname.startsWith("/admin");
+
+  const isActiveFavorites = pathname === "/favorites";
+
   const navLinks = [
     {
       href: "/",
@@ -57,19 +64,26 @@ const NavBarClient = ({ session }: { session: any }) => {
       icon: BookOpen,
       isActive: isActive,
     },
-    {
-      href: "/users",
-      label: "User",
-      icon: User,
-      isActive: isActiveUser,
-    },
-
-    {
-      href: "/profile",
-      label: "Profile",
-      icon: Settings,
-      isActive: isActiveProfile,
-    },
+    ...(session?.user
+      ? [
+          {
+            href: "/favorites",
+            label: "Favorites",
+            icon: Heart,
+            isActive: isActiveFavorites,
+          },
+        ]
+      : []),
+    ...(isAdmin
+      ? [
+          {
+            href: "/admin",
+            label: "Admin",
+            icon: Shield,
+            isActive: isActiveAdmin,
+          },
+        ]
+      : []),
   ];
 
   return (
@@ -116,11 +130,12 @@ const NavBarClient = ({ session }: { session: any }) => {
 
             {/* Desktop Actions */}
             <div className="hidden items-center gap-3 md:flex">
+              <ThemeToggle />
               {session?.user ? (
                 <div className="flex place-content-center gap-5">
                   <Link
                     href="/create-recipe"
-                    className="inline-flex h-10 w-10 items-center justify-center gap-2 rounded-md bg-slate-900 font-semibold text-white transition-colors hover:bg-slate-800"
+                    className="inline-flex h-10 w-10 items-center justify-center gap-2 rounded-md bg-primary font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
                   >
                     <Plus className="flex h-5 w-5" />
                   </Link>
@@ -128,12 +143,13 @@ const NavBarClient = ({ session }: { session: any }) => {
                     email={session.user.email as string}
                     name={session.user.name as string}
                     image={session.user.image as string}
+                    role={session.user.role}
                   />
                 </div>
               ) : (
                 <Link
                   href="/login"
-                  className="hover inline-flex items-center gap-2 rounded-lg border-2 px-6 py-3 font-semibold transition-colors hover:bg-slate-800 hover:text-white"
+                  className="hover inline-flex items-center gap-2 rounded-lg border-2 border-border px-6 py-3 font-semibold transition-colors hover:bg-primary hover:text-primary-foreground"
                 >
                   <span className="hidden lg:inline">Login</span>
                 </Link>
@@ -206,6 +222,10 @@ const NavBarClient = ({ session }: { session: any }) => {
 
             {/* Mobile User Section */}
             <div className="border-t pt-4">
+              <div className="mb-4 flex items-center justify-between px-4">
+                <span className="text-sm font-medium text-foreground/70">Theme</span>
+                <ThemeToggle />
+              </div>
               {session?.user ? (
                 <div className="space-y-3">
                   <div className="bg-accent/50 flex items-center gap-3 rounded-lg px-2 py-3">
@@ -231,15 +251,15 @@ const NavBarClient = ({ session }: { session: any }) => {
                       </p>
                     </div>
                   </div>
-                  <Link
-                    href="/api/auth/signout"
+                  <button
+                    onClick={() => signOut({ redirect: true, callbackUrl: "/" })}
                     className={clsx(
                       "flex w-full justify-center",
                       buttonVariants({ variant: "outline" }),
                     )}
                   >
                     Sign Out
-                  </Link>
+                  </button>
                 </div>
               ) : (
                 <Link

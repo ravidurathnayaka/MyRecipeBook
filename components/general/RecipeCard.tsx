@@ -40,11 +40,11 @@ const RecipeCard: React.FC<{ recipe: Recipe; onClick: () => void }> = ({
 }) => {
   const getCategoryColor = (category: Category): string => {
     const colors: Record<Category, string> = {
-      [Category.BREAKFAST]: "bg-amber-100 text-amber-800 hover:bg-amber-200",
-      [Category.LUNCH]: "bg-emerald-100 text-emerald-800 hover:bg-emerald-200",
-      [Category.DINNER]: "bg-blue-100 text-blue-800 hover:bg-blue-200",
-      [Category.DESSERT]: "bg-pink-100 text-pink-800 hover:bg-pink-200",
-      [Category.SNACK]: "bg-purple-100 text-purple-800 hover:bg-purple-200",
+      [Category.BREAKFAST]: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300 border-amber-200 dark:border-amber-800",
+      [Category.LUNCH]: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800",
+      [Category.DINNER]: "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300 border-orange-200 dark:border-orange-800",
+      [Category.DESSERT]: "bg-pink-100 text-pink-800 dark:bg-pink-900/30 dark:text-pink-300 border-pink-200 dark:border-pink-800",
+      [Category.SNACK]: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300 border-purple-200 dark:border-purple-800",
     };
     return colors[category];
   };
@@ -69,9 +69,9 @@ const RecipeCard: React.FC<{ recipe: Recipe; onClick: () => void }> = ({
           </Badge>
         </div>
         {recipe.makeTime && (
-          <div className="absolute top-3 right-3 flex items-center gap-1.5 rounded-full bg-white/95 px-3 py-1.5 shadow-md backdrop-blur-sm">
-            <Clock className="h-4 w-4 text-slate-600" />
-            <span className="text-sm font-medium text-slate-700">
+          <div className="absolute top-3 right-3 flex items-center gap-1.5 rounded-full bg-background/95 dark:bg-background/80 px-3 py-1.5 shadow-md backdrop-blur-sm border border-border/50">
+            <Clock className="h-4 w-4 text-muted-foreground" />
+            <span className="text-sm font-medium text-foreground">
               {recipe.makeTime} min
             </span>
           </div>
@@ -79,19 +79,19 @@ const RecipeCard: React.FC<{ recipe: Recipe; onClick: () => void }> = ({
       </div>
 
       <CardHeader className="pb-3">
-        <h3 className="line-clamp-2 text-xl font-bold text-slate-900 transition-colors group-hover:text-blue-600">
+        <h3 className="line-clamp-2 text-xl font-bold text-card-foreground transition-colors group-hover:text-primary">
           {recipe.title}
         </h3>
       </CardHeader>
 
       <CardContent className="pb-4">
-        <p className="line-clamp-2 text-sm leading-relaxed text-slate-600">
+        <p className="line-clamp-2 text-sm leading-relaxed text-muted-foreground">
           {recipe.description}
         </p>
       </CardContent>
 
-      <CardFooter className="flex items-center justify-between border-t border-slate-100 pt-0 pt-4">
-        <div className="flex items-center gap-2 text-slate-600">
+      <CardFooter className="flex items-center justify-between border-t border-border pt-0 pt-4">
+        <div className="flex items-center gap-2 text-muted-foreground">
           {recipe.author ? (
             <>
               <User className="h-4 w-4" />
@@ -105,7 +105,7 @@ const RecipeCard: React.FC<{ recipe: Recipe; onClick: () => void }> = ({
           )}
         </div>
         <Link href={`/recipe/${recipe.id}`}>
-          <button className="cursor-pointer rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-slate-800 hover:shadow-md">
+          <button className="cursor-pointer rounded-lg bg-primary text-primary-foreground px-4 py-2 text-sm font-medium shadow-sm transition-colors hover:bg-primary/90 hover:shadow-md">
             View Recipe
           </button>
         </Link>

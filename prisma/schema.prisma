@@ -70,8 +70,13 @@ model User {
   accounts      Account[]
   sessions      Session[]
   recipes       Recipe[]
+  favoriteRecipes FavoriteRecipe[]
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
+
+  @@index([email])
+  @@index([role])
+  @@index([createdAt])
 }
 
 model Recipe {
@@ -87,8 +92,29 @@ model Recipe {
   status        RecipeStatus  @default(PENDING)
   author        User?         @relation(fields: [authorId], references: [id])
   authorId      String?
+  favoriteRecipes FavoriteRecipe[]
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
+
+  @@index([authorId])
+  @@index([status])
+  @@index([category])
+  @@index([createdAt])
+  @@index([status, category])
+  @@index([authorId, status])
+}
+
+model FavoriteRecipe {
+  id        String   @id @default(uuid())
+  userId    String
+  recipeId  String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  recipe    Recipe   @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, recipeId])
+  @@index([userId])
+  @@index([recipeId])
 }
 
 

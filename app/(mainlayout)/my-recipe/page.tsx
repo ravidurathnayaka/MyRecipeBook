@@ -92,15 +92,23 @@ const MyRecipesPage: React.FC = () => {
 
       const data = await response.json();
       console.log("Fetched recipes:", data);
-      setRecipes(data);
+      // API returns { recipes: [...], pagination: {...} }
+      const recipesArray = Array.isArray(data.recipes) ? data.recipes : (Array.isArray(data) ? data : []);
+      setRecipes(recipesArray);
     } catch (error) {
       console.error("Error fetching recipes:", error);
+      setRecipes([]); // Set empty array on error to prevent iteration errors
     } finally {
       setLoading(false);
     }
   };
 
   const filterRecipes = () => {
+    // Ensure recipes is always an array
+    if (!Array.isArray(recipes)) {
+      setFilteredRecipes([]);
+      return;
+    }
     let filtered = [...recipes];
 
     if (searchQuery) {
@@ -213,7 +221,7 @@ const MyRecipesPage: React.FC = () => {
   // Auth check
   if (status === "loading") {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100">
+      <div className="flex min-h-screen items-center justify-center bg-background">
         <Loader2 className="h-12 w-12 animate-spin text-slate-600" />
       </div>
     );
@@ -244,13 +252,13 @@ const MyRecipesPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+    <div className="min-h-screen bg-background">
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900">My Recipes</h1>
-            <p className="mt-1 text-slate-600">Manage your recipe collection</p>
+            <h1 className="text-2xl font-bold text-foreground">My Recipes</h1>
+            <p className="mt-1 text-muted-foreground">Manage your recipe collection</p>
           </div>
           <button
             onClick={handleCreateRecipe}
@@ -270,7 +278,7 @@ const MyRecipesPage: React.FC = () => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search your recipes..."
-              className="w-full rounded-lg border-2 border-slate-200 bg-white px-2 py-3 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              className="w-full rounded-lg border-2 border-input bg-background px-2 py-3 text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-blue-500 focus:outline-none"
             />
           </div>
         </div>

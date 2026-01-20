@@ -11,10 +11,15 @@ import {
   CheckCircle2,
   Loader2,
   AlertCircle,
+  Printer,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { useParams, useRouter } from "next/navigation";
+import { FavoriteButton } from "@/components/general/FavoriteButton";
+import { ShareButton } from "@/components/general/ShareButton";
+import { ShoppingListButton } from "@/components/general/ShoppingListButton";
 
 // Prisma enums and types
 enum Category {
@@ -92,11 +97,11 @@ const RecipeDetailPage: React.FC<RecipeDetailPageProps> = () => {
 
   const getCategoryColor = (category: Category): string => {
     const colors: Record<Category, string> = {
-      [Category.BREAKFAST]: "bg-amber-100 text-amber-800",
-      [Category.LUNCH]: "bg-emerald-100 text-emerald-800",
-      [Category.DINNER]: "bg-blue-100 text-blue-800",
-      [Category.DESSERT]: "bg-pink-100 text-pink-800",
-      [Category.SNACK]: "bg-purple-100 text-purple-800",
+      [Category.BREAKFAST]: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300",
+      [Category.LUNCH]: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300",
+      [Category.DINNER]: "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300",
+      [Category.DESSERT]: "bg-pink-100 text-pink-800 dark:bg-pink-900/30 dark:text-pink-300",
+      [Category.SNACK]: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300",
     };
     return colors[category];
   };
@@ -121,16 +126,16 @@ const RecipeDetailPage: React.FC<RecipeDetailPageProps> = () => {
   };
 
   const handleBack = () => {
-    router.push("/");
+    router.back();
   };
 
   // Loading State
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="w-12 h-12 animate-spin text-slate-600 mx-auto mb-4" />
-          <p className="text-slate-600">Loading recipe...</p>
+          <Loader2 className="w-12 h-12 animate-spin text-muted-foreground mx-auto mb-4" />
+          <p className="text-muted-foreground">Loading recipe...</p>
         </div>
       </div>
     );
@@ -139,23 +144,23 @@ const RecipeDetailPage: React.FC<RecipeDetailPageProps> = () => {
   // Error State
   if (error || !recipe) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center px-4">
-        <Card className="max-w-md w-full shadow-xl border-0 text-center">
+      <div className="min-h-screen bg-background flex items-center justify-center px-4">
+        <Card className="max-w-md w-full shadow-xl border text-center">
           <CardContent className="pt-12 pb-8">
-            <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <AlertCircle className="w-12 h-12 text-red-600" />
+            <div className="w-20 h-20 bg-destructive/10 dark:bg-destructive/20 rounded-full flex items-center justify-center mx-auto mb-6">
+              <AlertCircle className="w-12 h-12 text-destructive" />
             </div>
-            <h2 className="text-3xl font-bold text-slate-900 mb-3">
+            <h2 className="text-3xl font-bold text-foreground mb-3">
               {error === "Recipe not found"
                 ? "Recipe Not Found"
                 : "Error Loading Recipe"}
             </h2>
-            <p className="text-slate-600 mb-6">
+            <p className="text-muted-foreground mb-6">
               {error || "Something went wrong while loading the recipe."}
             </p>
             <button
               onClick={handleBack}
-              className="px-6 py-3 bg-slate-900 text-white rounded-lg font-semibold hover:bg-slate-800 transition-colors"
+              className="px-6 py-3 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90 transition-colors"
             >
               Back to Home
             </button>
@@ -166,7 +171,7 @@ const RecipeDetailPage: React.FC<RecipeDetailPageProps> = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+    <div className="min-h-screen bg-background">
       {/* Hero Section */}
       <div className="relative h-96 w-full">
         <img
@@ -179,13 +184,31 @@ const RecipeDetailPage: React.FC<RecipeDetailPageProps> = () => {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
 
-        {/* Back Button */}
-        <button
-          onClick={handleBack}
-          className="absolute top-6 left-6 bg-white/90 backdrop-blur-sm hover:bg-white p-3 rounded-full shadow-lg transition-all hover:shadow-xl"
-        >
-          <ArrowLeft className="w-5 h-5 text-slate-900" />
-        </button>
+        {/* Action Buttons */}
+        <div className="no-print absolute top-6 left-6 right-6 flex items-center justify-between">
+          <button
+            onClick={handleBack}
+            className="bg-white/90 backdrop-blur-sm hover:bg-white p-3 rounded-full shadow-lg transition-all hover:shadow-xl"
+          >
+            <ArrowLeft className="w-5 h-5 text-slate-900" />
+          </button>
+          <div className="flex items-center gap-2">
+            <FavoriteButton recipeId={id as string} variant="outline" />
+            <ShareButton
+              recipeId={id as string}
+              recipeTitle={recipe.title}
+              variant="outline"
+            />
+            <Button
+              variant="outline"
+              size="default"
+              onClick={() => window.print()}
+              className="bg-white/90 backdrop-blur-sm"
+            >
+              <Printer className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
 
         {/* Title Overlay */}
         <div className="absolute bottom-0 left-0 right-0 p-8 text-white">
@@ -215,14 +238,14 @@ const RecipeDetailPage: React.FC<RecipeDetailPageProps> = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {recipe.makeTime && (
                 <div className="flex items-center gap-3">
-                  <div className="bg-blue-100 p-3 rounded-full">
-                    <Clock className="w-6 h-6 text-blue-600" />
+                  <div className="bg-primary/10 dark:bg-primary/20 p-3 rounded-full">
+                    <Clock className="w-6 h-6 text-primary" />
                   </div>
                   <div>
-                    <p className="text-sm text-slate-500 font-medium">
+                    <p className="text-sm text-muted-foreground font-medium">
                       Prep Time
                     </p>
-                    <p className="text-lg font-bold text-slate-900">
+                    <p className="text-lg font-bold text-foreground">
                       {recipe.makeTime} minutes
                     </p>
                   </div>
@@ -238,15 +261,15 @@ const RecipeDetailPage: React.FC<RecipeDetailPageProps> = () => {
                       className="w-12 h-12 rounded-full object-cover"
                     />
                   ) : (
-                    <div className="bg-emerald-100 p-3 rounded-full">
-                      <User className="w-6 h-6 text-emerald-600" />
+                    <div className="bg-emerald-100 dark:bg-emerald-900/30 p-3 rounded-full">
+                      <User className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
                     </div>
                   )}
                   <div>
-                    <p className="text-sm text-slate-500 font-medium">
+                    <p className="text-sm text-muted-foreground font-medium">
                       Recipe By
                     </p>
-                    <p className="text-lg font-bold text-slate-900">
+                    <p className="text-lg font-bold text-foreground">
                       {recipe.author.name || "Anonymous"}
                     </p>
                   </div>
@@ -254,8 +277,8 @@ const RecipeDetailPage: React.FC<RecipeDetailPageProps> = () => {
               )}
 
               <div className="flex items-center gap-3">
-                <div className="bg-purple-100 p-3 rounded-full">
-                  <Calendar className="w-6 h-6 text-purple-600" />
+                <div className="bg-purple-100 dark:bg-purple-900/30 p-3 rounded-full">
+                  <Calendar className="w-6 h-6 text-purple-600 dark:text-purple-400" />
                 </div>
                 <div>
                   <p className="text-sm text-slate-500 font-medium">
@@ -275,10 +298,16 @@ const RecipeDetailPage: React.FC<RecipeDetailPageProps> = () => {
           <div className="lg:col-span-1">
             <Card className="shadow-lg border-0 sticky top-6">
               <CardContent className="p-6">
-                <h2 className="text-2xl font-bold text-slate-900 mb-4 flex items-center gap-2">
-                  <ChefHat className="w-6 h-6 text-blue-600" />
-                  Ingredients
-                </h2>
+                <div className="mb-4 flex items-center justify-between">
+                  <h2 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
+                    <ChefHat className="w-6 h-6 text-blue-600" />
+                    Ingredients
+                  </h2>
+                  <ShoppingListButton
+                    ingredients={recipe.ingredients}
+                    recipeTitle={recipe.title}
+                  />
+                </div>
                 <ul className="space-y-3">
                   {recipe.ingredients.map((ingredient, index) => (
                     <li

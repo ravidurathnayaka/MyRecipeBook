@@ -1,4 +1,5 @@
-import { signOut } from "@/app/utils/auth";
+"use client";
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,17 +12,36 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import { ChevronDown, Heart, Layers2, LogOut } from "lucide-react";
+import { ChevronDown, Heart, Layers2, LogOut, Shield, User } from "lucide-react";
 import Link from "next/link";
-import { handleSignOut } from "@/app/action";
+import { signOut } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 interface iAppProps {
   email: string;
   name: string;
   image: string;
+  role?: "USER" | "SUPER_ADMIN";
 }
 
-export function UserDropdown({ email, name, image }: iAppProps) {
+export function UserDropdown({ email, name, image, role }: iAppProps) {
+  const isAdmin = role === "SUPER_ADMIN";
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    try {
+      await signOut({ 
+        redirect: true,
+        callbackUrl: "/" 
+      });
+    } catch (error) {
+      console.error("Error signing out:", error);
+      // Fallback: redirect manually if signOut fails
+      router.push("/");
+      window.location.reload();
+    }
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -40,23 +60,45 @@ export function UserDropdown({ email, name, image }: iAppProps) {
           <span className="text-muted-foreground truncate text-xs font-normal">
             {email}
           </span>
+          {isAdmin && (
+            <span className="text-primary truncate text-xs font-semibold mt-1">
+              Super Admin
+            </span>
+          )}
         </DropdownMenuLabel>
 
+        <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
-          <form action={handleSignOut}>
-            <button
-              type="submit"
-              className="flex w-full cursor-pointer items-center gap-2"
-            >
-              <LogOut
-                size={16}
-                strokeWidth={2}
-                className="opacity-60"
-                aria-hidden="true"
-              />
-              <span>Logout</span>
-            </button>
-          </form>
+          <Link href="/profile" className="flex w-full items-center gap-2">
+            <User size={16} strokeWidth={2} className="opacity-60" />
+            <span>My Profile</span>
+          </Link>
+        </DropdownMenuItem>
+
+        {isAdmin && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem asChild>
+              <Link href="/admin" className="flex w-full items-center gap-2">
+                <Shield size={16} strokeWidth={2} className="opacity-60" />
+                <span>Admin Dashboard</span>
+              </Link>
+            </DropdownMenuItem>
+          </>
+        )}
+
+        <DropdownMenuSeparator />
+        <DropdownMenuItem
+          onClick={handleLogout}
+          className="cursor-pointer"
+        >
+          <LogOut
+            size={16}
+            strokeWidth={2}
+            className="opacity-60"
+            aria-hidden="true"
+          />
+          <span>Logout</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

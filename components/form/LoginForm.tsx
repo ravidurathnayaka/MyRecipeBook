@@ -11,7 +11,7 @@ import type { SVGProps } from "react";
 
 import { redirect } from "next/navigation";
 import { GeneralSubmitButton } from "../general/SubmitButtons";
-import { auth, signIn } from "@/app/utils/auth";
+import { auth, signIn } from "@/lib/auth";
 
 const Google = (props: SVGProps<SVGSVGElement>) => (
   <svg

@@ -1,16 +1,24 @@
-import { auth } from "@/app/utils/auth";
-import prisma from "@/app/utils/db";
-import { NextResponse } from "next/server";
+import { auth } from "@/lib/auth";
+import prisma from "@/lib/db";
+import { NextRequest, NextResponse } from "next/server";
+import { validateBody, validateQuery } from "@/lib/middleware/validate";
+import { createRecipeSchema, recipeQuerySchema } from "@/lib/validations";
+import { formatErrorResponse, AppError } from "@/lib/errors";
+import { logger } from "@/lib/logger";
 
 // GET all recipes
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
     const session = await auth();
 
-    const { searchParams } = new URL(request.url);
-    const category = searchParams.get("category");
-    const authorId = searchParams.get("authorId");
-    const search = searchParams.get("search");
+    // Validate query parameters
+    const queryValidation = validateQuery(recipeQuerySchema)(request);
+    if (!queryValidation.success) {
+      return queryValidation.response;
+    }
+    const { page = 1, limit = 10, category, authorId, search, status } = queryValidation.data;
+
+    const skip = (page - 1) * limit;
 
     // Build where clause based on query parameters
     const where: any = {};
@@ -18,6 +26,8 @@ export async function GET(request: Request) {
     // Super admins see all recipes, users only see approved
     if (session?.user?.role !== "SUPER_ADMIN") {
       where.status = "APPROVED";
+    } else if (status) {
+      where.status = status;
     }
 
     if (category) {
@@ -35,43 +45,70 @@ export async function GET(request: Request) {
       ];
     }
 
-    const recipes = await prisma.recipe.findMany({
-      where,
-      include: {
-        author: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            image: true,
+    const [recipes, total] = await Promise.all([
+      prisma.recipe.findMany({
+        where,
+        include: {
+          author: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              image: true,
+            },
           },
         },
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
+        orderBy: {
+          createdAt: "desc",
+        },
+        skip,
+        take: limit,
+      }),
+      prisma.recipe.count({ where }),
+    ]);
 
-    return NextResponse.json(recipes, { status: 200 });
-  } catch (error) {
-    console.error("Error fetching recipes:", error);
     return NextResponse.json(
-      { message: "Failed to fetch recipes" },
-      { status: 500 },
+      {
+        recipes,
+        pagination: {
+          total,
+          page,
+          limit,
+          totalPages: Math.ceil(total / limit),
+        },
+      },
+      { status: 200 }
+    );
+  } catch (error) {
+    logger.error("Error fetching recipes", error instanceof Error ? error : new Error(String(error)));
+    const errorResponse = formatErrorResponse(error);
+    return NextResponse.json(
+      { message: errorResponse.message, code: errorResponse.code },
+      { status: errorResponse.statusCode }
     );
   }
 }
 
 // Create a recipe
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     const session = await auth();
 
     if (!session?.user?.id) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+      throw new AppError("Authentication required", 401, "AUTHENTICATION_ERROR");
     }
 
-    const body = await request.json();
+    // Validate request body
+    const bodyValidation = await validateBody(createRecipeSchema)(request as NextRequest);
+    if (!bodyValidation.success) {
+      return bodyValidation.response;
+    }
+    const body = bodyValidation.data;
+
+    // Ensure authorId matches the authenticated user
+    if (body.authorId !== session.user.id) {
+      throw new AppError("Cannot create recipe for another user", 403, "AUTHORIZATION_ERROR");
+    }
 
     const recipe = await prisma.recipe.create({
       data: {
@@ -98,12 +135,18 @@ export async function POST(request: Request) {
       },
     });
 
+    logger.info("Recipe created", { recipeId: recipe.id, authorId: session.user.id });
+
     return NextResponse.json(recipe, { status: 201 });
   } catch (error) {
-    console.error("Error creating recipe:", error);
+    const session = await auth();
+    logger.error("Error creating recipe", error instanceof Error ? error : new Error(String(error)), {
+      userId: session?.user?.id,
+    });
+    const errorResponse = formatErrorResponse(error);
     return NextResponse.json(
-      { message: "Failed to create recipe" },
-      { status: 500 },
+      { message: errorResponse.message, code: errorResponse.code },
+      { status: errorResponse.statusCode }
     );
   }
 }

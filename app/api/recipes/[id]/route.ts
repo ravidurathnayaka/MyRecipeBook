@@ -1,4 +1,4 @@
-import prisma from "@/app/utils/db";
+import prisma from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 
 // GET recipe

@@ -85,15 +85,22 @@ const RecipeHomePage: React.FC = () => {
       }
 
       const data = await response.json();
-      setRecipes(data);
+      // API returns { recipes: [...], pagination: {...} }
+      setRecipes(data.recipes || []);
     } catch (error) {
       console.error("Error fetching recipes:", error);
+      setRecipes([]); // Set empty array on error to prevent iteration errors
     } finally {
       setLoading(false);
     }
   };
 
   const filterRecipes = () => {
+    // Ensure recipes is always an array
+    if (!Array.isArray(recipes)) {
+      setFilteredRecipes([]);
+      return;
+    }
     let filtered = [...recipes];
 
     // Filter by search query
@@ -132,14 +139,14 @@ const RecipeHomePage: React.FC = () => {
 
   const getCategoryColor = (category: Category | "ALL"): string => {
     if (category === "ALL") {
-      return "bg-slate-100 text-slate-800 border-slate-300";
+      return "bg-secondary text-secondary-foreground border-border hover:bg-secondary/80";
     }
     const colors: Record<Category, string> = {
-      [Category.BREAKFAST]: "bg-amber-100 text-amber-800 border-amber-300",
-      [Category.LUNCH]: "bg-emerald-100 text-emerald-800 border-emerald-300",
-      [Category.DINNER]: "bg-blue-100 text-blue-800 border-blue-300",
-      [Category.DESSERT]: "bg-pink-100 text-pink-800 border-pink-300",
-      [Category.SNACK]: "bg-purple-100 text-purple-800 border-purple-300",
+      [Category.BREAKFAST]: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300 border-amber-200 dark:border-amber-800 hover:bg-amber-200 dark:hover:bg-amber-900/50",
+      [Category.LUNCH]: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800 hover:bg-emerald-200 dark:hover:bg-emerald-900/50",
+      [Category.DINNER]: "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300 border-orange-200 dark:border-orange-800 hover:bg-orange-200 dark:hover:bg-orange-900/50",
+      [Category.DESSERT]: "bg-pink-100 text-pink-800 dark:bg-pink-900/30 dark:text-pink-300 border-pink-200 dark:border-pink-800 hover:bg-pink-200 dark:hover:bg-pink-900/50",
+      [Category.SNACK]: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300 border-purple-200 dark:border-purple-800 hover:bg-purple-200 dark:hover:bg-purple-900/50",
     };
     return colors[category];
   };
@@ -206,13 +213,13 @@ const RecipeHomePage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+    <div className="min-h-screen bg-background">
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900">All Recipes</h1>
-            <p className="mt-1 text-slate-600">
+            <h1 className="text-2xl font-bold text-foreground">All Recipes</h1>
+            <p className="mt-1 text-muted-foreground">
               Discover variant recipes and enjoy
             </p>
           </div>
@@ -227,7 +234,7 @@ const RecipeHomePage: React.FC = () => {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="  Search..."
-                className="focus:ring-primary w-full rounded-lg border-2 border-slate-200 bg-white px-2 py-3 focus:ring-2 focus:outline-none"
+                className="focus:ring-primary w-full rounded-lg border-2 border-input bg-background px-2 py-3 text-foreground placeholder:text-muted-foreground focus:ring-2 focus:outline-none"
               />
             </div>
             <button

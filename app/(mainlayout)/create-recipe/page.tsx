@@ -207,32 +207,32 @@ const RecipeCreatePage: React.FC<RecipeCreatePageProps> = ({
 
   const getCategoryColor = (category: Category): string => {
     const colors: Record<Category, string> = {
-      [Category.BREAKFAST]: "bg-amber-100 text-amber-800 border-amber-300",
-      [Category.LUNCH]: "bg-emerald-100 text-emerald-800 border-emerald-300",
-      [Category.DINNER]: "bg-blue-100 text-blue-800 border-blue-300",
-      [Category.DESSERT]: "bg-pink-100 text-pink-800 border-pink-300",
-      [Category.SNACK]: "bg-purple-100 text-purple-800 border-purple-300",
+      [Category.BREAKFAST]: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300 border-amber-200 dark:border-amber-800",
+      [Category.LUNCH]: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800",
+      [Category.DINNER]: "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300 border-orange-200 dark:border-orange-800",
+      [Category.DESSERT]: "bg-pink-100 text-pink-800 dark:bg-pink-900/30 dark:text-pink-300 border-pink-200 dark:border-pink-800",
+      [Category.SNACK]: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300 border-purple-200 dark:border-purple-800",
     };
     return colors[category];
   };
 
   if (submitSuccess) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 px-4">
-        <Card className="w-full max-w-md border-0 text-center shadow-xl">
+      <div className="flex min-h-screen items-center justify-center bg-background px-4">
+        <Card className="w-full max-w-md border text-center shadow-xl">
           <CardContent className="pt-12 pb-8">
-            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-green-100">
-              <CheckCircle className="h-12 w-12 text-green-600" />
+            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-900/30">
+              <CheckCircle className="h-12 w-12 text-emerald-600 dark:text-emerald-400" />
             </div>
-            <h2 className="mb-3 text-3xl font-bold text-slate-900">
+            <h2 className="mb-3 text-3xl font-bold text-foreground">
               Recipe Created!
             </h2>
-            <p className="mb-6 text-slate-600">
+            <p className="mb-6 text-muted-foreground">
               Your recipe has been successfully saved to the database.
             </p>
             <button
               onClick={handleCreateRecipe}
-              className="bg-primary mx-auto flex items-center justify-center gap-2 rounded-lg px-6 py-3 font-semibold text-white shadow-md transition-colors hover:bg-slate-800"
+              className="bg-primary text-primary-foreground mx-auto flex items-center justify-center gap-2 rounded-lg px-6 py-3 font-semibold shadow-md transition-colors hover:bg-primary/90"
             >
               <ChefHat className="h-5 w-5" />
               Go Home
@@ -244,14 +244,14 @@ const RecipeCreatePage: React.FC<RecipeCreatePageProps> = ({
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 px-4 py-8">
+    <div className="min-h-screen bg-background px-4 py-8">
       <div className="mx-auto max-w-4xl">
         <div className="mb-8 flex items-center justify-between">
           <div>
-            <h1 className="mb-2 text-4xl font-bold text-slate-900">
+            <h1 className="mb-2 text-4xl font-bold text-foreground">
               Create New Recipe
             </h1>
-            <p className="text-slate-600">
+            <p className="text-muted-foreground">
               Share your culinary masterpiece with the world
             </p>
           </div>
@@ -261,14 +261,14 @@ const RecipeCreatePage: React.FC<RecipeCreatePageProps> = ({
               className="rounded-full p-3 transition-colors hover:bg-white"
               disabled={isSubmitting}
             >
-              <ArrowLeft className="h-6 w-6 text-slate-600" />
+              <ArrowLeft className="h-6 w-6 text-muted-foreground" />
             </button>
           )}
         </div>
 
         {errors.submit && (
-          <div className="mb-6 rounded-lg border-2 border-red-200 bg-red-50 p-4">
-            <p className="font-medium text-red-800">{errors.submit}</p>
+          <div className="mb-6 rounded-lg border-2 border-destructive/20 bg-destructive/10 dark:bg-destructive/20 p-4">
+            <p className="font-medium text-destructive">{errors.submit}</p>
           </div>
         )}
 
@@ -279,7 +279,7 @@ const RecipeCreatePage: React.FC<RecipeCreatePageProps> = ({
             </CardHeader>
             <CardContent className="space-y-6">
               <div>
-                <label className="mb-2 block text-sm font-semibold text-slate-700">
+                <label className="mb-2 block text-sm font-semibold text-foreground">
                   Recipe Title *
                 </label>
                 <input
@@ -288,17 +288,17 @@ const RecipeCreatePage: React.FC<RecipeCreatePageProps> = ({
                   onChange={(e) => updateField("title", e.target.value)}
                   placeholder="e.g., Homemade Margherita Pizza"
                   disabled={isSubmitting}
-                  className={`w-full rounded-lg border-2 px-4 py-3 transition-colors focus:ring-2 focus:ring-blue-500 focus:outline-none disabled:cursor-not-allowed disabled:bg-slate-100 ${
-                    errors.title ? "border-red-300" : "border-slate-200"
+                  className={`w-full rounded-lg border-2 px-4 py-3 text-foreground placeholder:text-muted-foreground bg-background transition-colors focus:ring-2 focus:ring-blue-500 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 ${
+                    errors.title ? "border-red-300 dark:border-red-600" : "border-input"
                   }`}
                 />
                 {errors.title && (
-                  <p className="mt-1 text-sm text-red-600">{errors.title}</p>
+                  <p className="mt-1 text-sm text-destructive">{errors.title}</p>
                 )}
               </div>
 
               <div>
-                <label className="mb-2 block text-sm font-semibold text-slate-700">
+                <label className="mb-2 block text-sm font-semibold text-foreground">
                   Description *
                 </label>
                 <textarea
@@ -307,12 +307,12 @@ const RecipeCreatePage: React.FC<RecipeCreatePageProps> = ({
                   placeholder="Describe your recipe in a few sentences..."
                   rows={3}
                   disabled={isSubmitting}
-                  className={`w-full resize-none rounded-lg border-2 px-4 py-3 transition-colors focus:ring-2 focus:ring-blue-500 focus:outline-none disabled:cursor-not-allowed disabled:bg-slate-100 ${
-                    errors.description ? "border-red-300" : "border-slate-200"
+                  className={`w-full resize-none rounded-lg border-2 px-4 py-3 text-foreground placeholder:text-muted-foreground bg-background transition-colors focus:ring-2 focus:ring-blue-500 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 ${
+                    errors.description ? "border-red-300 dark:border-red-600" : "border-input"
                   }`}
                 />
                 {errors.description && (
-                  <p className="mt-1 text-sm text-red-600">
+                  <p className="mt-1 text-sm text-destructive">
                     {errors.description}
                   </p>
                 )}
@@ -320,7 +320,7 @@ const RecipeCreatePage: React.FC<RecipeCreatePageProps> = ({
 
               <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <div>
-                  <label className="mb-2 block text-sm font-semibold text-slate-700">
+                  <label className="mb-2 block text-sm font-semibold text-foreground">
                     Category *
                   </label>
                   <div className="flex flex-wrap gap-2">
@@ -332,7 +332,7 @@ const RecipeCreatePage: React.FC<RecipeCreatePageProps> = ({
                         } ${
                           formData.category === cat
                             ? getCategoryColor(cat)
-                            : "border-slate-200 bg-slate-100 text-slate-600 hover:border-slate-300"
+                            : "border-border bg-secondary text-secondary-foreground hover:bg-secondary/80"
                         }`}
                         onClick={() =>
                           !isSubmitting && updateField("category", cat)
@@ -345,7 +345,7 @@ const RecipeCreatePage: React.FC<RecipeCreatePageProps> = ({
                 </div>
 
                 <div>
-                  <label className="mb-2 block text-sm font-semibold text-slate-700">
+                  <label className="mb-2 block text-sm font-semibold text-foreground">
                     Prep Time (minutes)
                   </label>
                   <input
@@ -355,12 +355,12 @@ const RecipeCreatePage: React.FC<RecipeCreatePageProps> = ({
                     placeholder="30"
                     min="0"
                     disabled={isSubmitting}
-                    className={`w-full rounded-lg border-2 px-4 py-3 transition-colors focus:ring-2 focus:ring-blue-500 focus:outline-none disabled:cursor-not-allowed disabled:bg-slate-100 ${
-                      errors.makeTime ? "border-red-300" : "border-slate-200"
+                    className={`w-full rounded-lg border-2 px-4 py-3 text-foreground placeholder:text-muted-foreground bg-background transition-colors focus:ring-2 focus:ring-blue-500 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 ${
+                      errors.makeTime ? "border-red-300 dark:border-red-600" : "border-input"
                     }`}
                   />
                   {errors.makeTime && (
-                    <p className="mt-1 text-sm text-red-600">
+                    <p className="mt-1 text-sm text-destructive">
                       {errors.makeTime}
                     </p>
                   )}
@@ -368,19 +368,19 @@ const RecipeCreatePage: React.FC<RecipeCreatePageProps> = ({
               </div>
 
               <div>
-                <label className="mb-2 block text-sm font-semibold text-slate-700">
+                <label className="mb-2 block text-sm font-semibold text-foreground">
                   Image URL
                 </label>
                 <div className="flex gap-2">
                   <div className="relative flex-1">
-                    <Upload className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 text-slate-400" />
+                    <Upload className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
                     <input
                       type="url"
                       value={formData.imageUrl}
                       onChange={(e) => handleImageUrlChange(e.target.value)}
                       placeholder="https://example.com/image.jpg"
                       disabled={isSubmitting}
-                      className="w-full rounded-lg border-2 border-slate-200 py-3 pr-4 pl-11 focus:ring-2 focus:ring-blue-500 focus:outline-none disabled:cursor-not-allowed disabled:bg-slate-100"
+                      className="w-full rounded-lg border-2 border-input py-3 pr-4 pl-11 text-foreground placeholder:text-muted-foreground bg-background focus:ring-2 focus:ring-blue-500 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                     />
                   </div>
                 </div>
@@ -411,12 +411,12 @@ const RecipeCreatePage: React.FC<RecipeCreatePageProps> = ({
                     onChange={(e) => updateIngredient(index, e.target.value)}
                     placeholder={`Ingredient ${index + 1}`}
                     disabled={isSubmitting}
-                    className="flex-1 rounded-lg border-2 border-slate-200 px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:outline-none disabled:cursor-not-allowed disabled:bg-slate-100"
+                    className="flex-1 rounded-lg border-2 border-input px-4 py-3 text-foreground placeholder:text-muted-foreground bg-background focus:ring-2 focus:ring-blue-500 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                   />
                   <button
                     type="button"
                     onClick={() => removeIngredient(index)}
-                    className="rounded-lg p-3 text-red-600 transition-colors hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="rounded-lg p-3 text-destructive transition-colors hover:bg-destructive/10 disabled:cursor-not-allowed disabled:opacity-50"
                     disabled={formData.ingredients.length === 1 || isSubmitting}
                   >
                     <Trash2 className="h-5 w-5" />
@@ -424,13 +424,13 @@ const RecipeCreatePage: React.FC<RecipeCreatePageProps> = ({
                 </div>
               ))}
               {errors.ingredients && (
-                <p className="text-sm text-red-600">{errors.ingredients}</p>
+                <p className="text-sm text-destructive">{errors.ingredients}</p>
               )}
               <button
                 type="button"
                 onClick={addIngredient}
                 disabled={isSubmitting}
-                className="flex items-center gap-2 rounded-lg px-4 py-2 font-medium text-blue-600 transition-colors hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-50"
+                className="flex items-center gap-2 rounded-lg px-4 py-2 font-medium text-primary transition-colors hover:bg-accent disabled:cursor-not-allowed disabled:opacity-50"
               >
                 <Plus className="h-5 w-5" />
                 Add Ingredient
@@ -445,7 +445,7 @@ const RecipeCreatePage: React.FC<RecipeCreatePageProps> = ({
             <CardContent className="space-y-4">
               {formData.steps.map((step, index) => (
                 <div key={index} className="flex gap-2">
-                  <div className="mt-2 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-slate-900 font-bold text-white">
+                  <div className="mt-2 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-primary font-bold text-primary-foreground">
                     {index + 1}
                   </div>
                   <textarea
@@ -454,7 +454,7 @@ const RecipeCreatePage: React.FC<RecipeCreatePageProps> = ({
                     placeholder={`Step ${index + 1} instructions...`}
                     rows={2}
                     disabled={isSubmitting}
-                    className="flex-1 resize-none rounded-lg border-2 border-slate-200 px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:outline-none disabled:cursor-not-allowed disabled:bg-slate-100"
+                    className="flex-1 resize-none rounded-lg border-2 border-input px-4 py-3 text-foreground placeholder:text-muted-foreground bg-background focus:ring-2 focus:ring-blue-500 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                   />
                   <button
                     type="button"
@@ -473,7 +473,7 @@ const RecipeCreatePage: React.FC<RecipeCreatePageProps> = ({
                 type="button"
                 onClick={addStep}
                 disabled={isSubmitting}
-                className="flex items-center gap-2 rounded-lg px-4 py-2 font-medium text-blue-600 transition-colors hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-50"
+                className="flex items-center gap-2 rounded-lg px-4 py-2 font-medium text-primary transition-colors hover:bg-accent disabled:cursor-not-allowed disabled:opacity-50"
               >
                 <Plus className="h-5 w-5" />
                 Add Step
@@ -492,7 +492,7 @@ const RecipeCreatePage: React.FC<RecipeCreatePageProps> = ({
                 placeholder="Share your expert tips and tricks for making this recipe perfect..."
                 rows={4}
                 disabled={isSubmitting}
-                className="w-full resize-none rounded-lg border-2 border-slate-200 px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:outline-none disabled:cursor-not-allowed disabled:bg-slate-100"
+                className="w-full resize-none rounded-lg border-2 border-input px-4 py-3 text-foreground placeholder:text-muted-foreground bg-background focus:ring-2 focus:ring-blue-500 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
               />
             </CardContent>
           </Card>
@@ -503,7 +503,7 @@ const RecipeCreatePage: React.FC<RecipeCreatePageProps> = ({
                 type="button"
                 onClick={onCancel}
                 disabled={isSubmitting}
-                className="rounded-lg bg-white px-6 py-3 font-semibold text-slate-700 shadow-md transition-colors hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+                className="rounded-lg bg-secondary text-secondary-foreground px-6 py-3 font-semibold shadow-md transition-colors hover:bg-secondary/80 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 Cancel
               </button>
