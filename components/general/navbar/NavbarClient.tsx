@@ -88,7 +88,7 @@ const NavBarClient = ({ session }: { session: any }) => {
 
   return (
     <>
-      <nav className="bg-background/95 supports-backdrop-filter:bg-background/60 sticky top-0 z-50 border-b-2 py-1 backdrop-blur">
+      <nav className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
         <div className="mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
             <div className="flex gap-5">
@@ -191,7 +191,7 @@ const NavBarClient = ({ session }: { session: any }) => {
         {/* Mobile Menu */}
         <div
           className={clsx(
-            "bg-background fixed top-16 right-0 left-0 z-50 border-b-2 shadow-lg transition-all duration-300 ease-in-out md:hidden",
+            "fixed top-16 right-0 left-0 z-50 border-b bg-background shadow-lg transition-all duration-300 ease-in-out md:hidden",
             mobileMenuOpen
               ? "translate-y-0 opacity-100"
               : "pointer-events-none -translate-y-full opacity-0",

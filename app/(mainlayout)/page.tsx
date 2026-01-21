@@ -17,6 +17,8 @@ import {
   CardHeader,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { useSession } from "next-auth/react";
 import RecipeCard from "@/components/general/RecipeCard";
 
@@ -124,7 +126,7 @@ const RecipeHomePage: React.FC = () => {
 
   const handleRecipeClick = (recipeId: string) => {
     // Navigate to recipe detail page
-    window.location.href = `/recipes/${recipeId}`;
+    window.location.href = `/recipe/${recipeId}`;
   };
 
   const handleCreateRecipe = () => {
@@ -216,56 +218,61 @@ const RecipeHomePage: React.FC = () => {
     <div className="min-h-screen bg-background">
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">All Recipes</h1>
-            <p className="mt-1 text-muted-foreground">
-              Discover variant recipes and enjoy
+        <div className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="space-y-1">
+            <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+              All Recipes
+            </h1>
+            <p className="text-base text-muted-foreground sm:text-lg">
+              Discover delicious recipes and enjoy cooking
             </p>
           </div>
         </div>
         {/* Search and Filter */}
         <div className="mb-8 space-y-4">
-          <div className="flex gap-4">
+          <div className="flex flex-col gap-4 sm:flex-row">
             <div className="relative flex-1">
-              <Search className="absolute top-1/2 right-2 h-5 w-5 -translate-y-1/2 text-slate-400" />
-              <input
+              <Search className="absolute right-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+              <Input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="  Search..."
-                className="focus:ring-primary w-full rounded-lg border-2 border-input bg-background px-2 py-3 text-foreground placeholder:text-muted-foreground focus:ring-2 focus:outline-none"
+                placeholder="Search recipes..."
+                className="pr-10 w-full"
+                aria-label="Search recipes"
               />
             </div>
-            <button
+            <Button
               onClick={() => setShowFilters(!showFilters)}
-              className={`flex items-center gap-2 rounded-lg border-2 px-6 py-3 font-semibold transition-colors ${
-                showFilters
-                  ? "border-slate-900 bg-slate-900 text-white"
-                  : "border-slate-200 bg-white text-slate-700 hover:border-slate-300"
-              }`}
+              variant={showFilters ? "default" : "outline"}
+              className="flex items-center gap-2"
+              aria-expanded={showFilters}
+              aria-label="Toggle filters"
             >
-              <Filter className="h-5 w-5" />
+              <Filter className="h-4 w-4" />
               Filters
-            </button>
+            </Button>
           </div>
 
           {/* Category Filters */}
           {showFilters && (
-            <Card className="border-0 shadow-md">
-              <CardContent className="p-4">
-                <div className="mb-3 flex items-center justify-between">
-                  <h3 className="font-semibold text-slate-900">
+            <Card>
+              <CardContent className="pt-6">
+                <div className="mb-4 flex items-center justify-between">
+                  <h3 className="text-base font-semibold text-foreground">
                     Filter by Category
                   </h3>
                   {(searchQuery || selectedCategory !== "ALL") && (
-                    <button
+                    <Button
                       onClick={clearFilters}
-                      className="flex items-center gap-1 text-sm font-medium text-blue-600 hover:text-blue-700"
+                      variant="ghost"
+                      size="sm"
+                      className="flex items-center gap-1.5 text-primary hover:text-primary/90"
+                      aria-label="Clear all filters"
                     >
                       <X className="h-4 w-4" />
                       Clear Filters
-                    </button>
+                    </Button>
                   )}
                 </div>
                 <div className="flex flex-wrap gap-2">
@@ -273,9 +280,18 @@ const RecipeHomePage: React.FC = () => {
                     className={`cursor-pointer border-2 transition-all ${
                       selectedCategory === "ALL"
                         ? getCategoryColor("ALL")
-                        : "border-slate-200 bg-white text-slate-600 hover:border-slate-300"
+                        : "border-border bg-card text-muted-foreground hover:bg-accent hover:text-accent-foreground"
                     }`}
                     onClick={() => setSelectedCategory("ALL")}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        setSelectedCategory("ALL");
+                      }
+                    }}
+                    aria-pressed={selectedCategory === "ALL"}
                   >
                     ALL
                   </Badge>
@@ -285,9 +301,18 @@ const RecipeHomePage: React.FC = () => {
                       className={`cursor-pointer border-2 transition-all ${
                         selectedCategory === cat
                           ? getCategoryColor(cat)
-                          : "border-slate-200 bg-white text-slate-600 hover:border-slate-300"
+                          : "border-border bg-card text-muted-foreground hover:bg-accent hover:text-accent-foreground"
                       }`}
                       onClick={() => setSelectedCategory(cat)}
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          setSelectedCategory(cat);
+                        }
+                      }}
+                      aria-pressed={selectedCategory === cat}
                     >
                       {cat}
                     </Badge>
@@ -299,36 +324,36 @@ const RecipeHomePage: React.FC = () => {
         </div>
 
         {/* Results Count */}
-        <div className="mb-6 flex items-center justify-between">
-          <p className="text-slate-600">
+        <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-sm text-muted-foreground">
             {loading ? (
               "Loading recipes..."
             ) : (
               <>
                 Showing{" "}
-                <span className="font-semibold text-slate-900">
+                <span className="font-semibold text-foreground">
                   {startIndex + 1}
                 </span>{" "}
                 -{" "}
-                <span className="font-semibold text-slate-900">
+                <span className="font-semibold text-foreground">
                   {Math.min(endIndex, filteredRecipes.length)}
                 </span>{" "}
                 of{" "}
-                <span className="font-semibold text-slate-900">
+                <span className="font-semibold text-foreground">
                   {filteredRecipes.length}
                 </span>{" "}
-                recipes
+                {filteredRecipes.length === 1 ? "recipe" : "recipes"}
               </>
             )}
           </p>
           {!loading && totalPages > 1 && (
-            <p className="text-slate-600">
+            <p className="text-sm text-muted-foreground">
               Page{" "}
-              <span className="font-semibold text-slate-900">
+              <span className="font-semibold text-foreground">
                 {currentPage}
               </span>{" "}
               of{" "}
-              <span className="font-semibold text-slate-900">{totalPages}</span>
+              <span className="font-semibold text-foreground">{totalPages}</span>
             </p>
           )}
         </div>
@@ -337,8 +362,8 @@ const RecipeHomePage: React.FC = () => {
         {loading && (
           <div className="flex items-center justify-center py-20">
             <div className="text-center">
-              <Loader2 className="mx-auto mb-4 h-12 w-12 animate-spin text-slate-600" />
-              <p className="text-slate-600">Loading recipes...</p>
+              <Loader2 className="mx-auto mb-4 h-12 w-12 animate-spin text-primary" />
+              <p className="text-muted-foreground">Loading recipes...</p>
             </div>
           </div>
         )}
@@ -346,25 +371,26 @@ const RecipeHomePage: React.FC = () => {
         {/* No Results */}
         {!loading && filteredRecipes.length === 0 && (
           <div className="py-20 text-center">
-            <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-slate-100">
-              <Search className="h-10 w-10 text-slate-400" />
+            <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-muted">
+              <Search className="h-10 w-10 text-muted-foreground" />
             </div>
-            <h3 className="mb-2 text-2xl font-bold text-slate-900">
+            <h3 className="mb-2 text-2xl font-bold text-foreground">
               No recipes found
             </h3>
-            <p className="mb-6 text-slate-600">
+            <p className="mb-6 text-muted-foreground">
               {searchQuery || selectedCategory !== "ALL"
                 ? "Try adjusting your filters or search query"
                 : "Be the first to create a recipe!"}
             </p>
             {session && (
-              <button
+              <Button
                 onClick={handleCreateRecipe}
-                className="inline-flex items-center gap-2 rounded-lg bg-slate-900 px-6 py-3 font-semibold text-white transition-colors hover:bg-slate-800"
+                className="inline-flex items-center gap-2"
+                size="lg"
               >
                 <Plus className="h-5 w-5" />
                 Create Recipe
-              </button>
+              </Button>
             )}
           </div>
         )}
@@ -384,43 +410,53 @@ const RecipeHomePage: React.FC = () => {
 
             {/* Pagination */}
             {totalPages > 1 && (
-              <div className="flex items-center justify-center gap-2">
-                <button
+              <nav
+                className="flex items-center justify-center gap-2"
+                aria-label="Pagination"
+              >
+                <Button
                   onClick={goToPrevious}
                   disabled={currentPage === 1}
-                  className="rounded-lg border-2 border-slate-200 bg-white p-2 transition-colors hover:border-slate-300 disabled:cursor-not-allowed disabled:opacity-50"
+                  variant="outline"
+                  size="icon"
+                  aria-label="Previous page"
                 >
-                  <ChevronLeft className="h-5 w-5 text-slate-600" />
-                </button>
+                  <ChevronLeft className="h-5 w-5" />
+                </Button>
 
                 {getPageNumbers().map((page, index) =>
                   typeof page === "number" ? (
-                    <button
+                    <Button
                       key={index}
                       onClick={() => goToPage(page)}
-                      className={`h-10 w-10 rounded-lg border-2 font-semibold transition-colors ${
-                        currentPage === page
-                          ? "border-slate-900 bg-slate-900 text-white"
-                          : "border-slate-200 bg-white text-slate-700 hover:border-slate-300"
-                      }`}
+                      variant={currentPage === page ? "default" : "outline"}
+                      className="h-10 w-10"
+                      aria-label={`Go to page ${page}`}
+                      aria-current={currentPage === page ? "page" : undefined}
                     >
                       {page}
-                    </button>
+                    </Button>
                   ) : (
-                    <span key={index} className="px-2 text-slate-400">
+                    <span
+                      key={index}
+                      className="px-2 text-muted-foreground"
+                      aria-hidden="true"
+                    >
                       {page}
                     </span>
                   ),
                 )}
 
-                <button
+                <Button
                   onClick={goToNext}
                   disabled={currentPage === totalPages}
-                  className="rounded-lg border-2 border-slate-200 bg-white p-2 transition-colors hover:border-slate-300 disabled:cursor-not-allowed disabled:opacity-50"
+                  variant="outline"
+                  size="icon"
+                  aria-label="Next page"
                 >
-                  <ChevronRight className="h-5 w-5 text-slate-600" />
-                </button>
-              </div>
+                  <ChevronRight className="h-5 w-5" />
+                </Button>
+              </nav>
             )}
           </>
         )}

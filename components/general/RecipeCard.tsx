@@ -1,6 +1,7 @@
 import { ChefHat, Clock, User } from "lucide-react";
 import { Card, CardContent, CardFooter, CardHeader } from "../ui/card";
 import { Badge } from "../ui/badge";
+import { Button } from "../ui/button";
 import Link from "next/link";
 
 enum Category {
@@ -104,10 +105,14 @@ const RecipeCard: React.FC<{ recipe: Recipe; onClick: () => void }> = ({
             </>
           )}
         </div>
-        <Link href={`/recipe/${recipe.id}`}>
-          <button className="cursor-pointer rounded-lg bg-primary text-primary-foreground px-4 py-2 text-sm font-medium shadow-sm transition-colors hover:bg-primary/90 hover:shadow-md">
+        <Link href={`/recipe/${recipe.id}`} className="shrink-0">
+          <Button
+            size="sm"
+            className="w-full sm:w-auto"
+            aria-label={`View recipe: ${recipe.title}`}
+          >
             View Recipe
-          </button>
+          </Button>
         </Link>
       </CardFooter>
     </Card>

@@ -186,12 +186,15 @@ const RecipeDetailPage: React.FC<RecipeDetailPageProps> = () => {
 
         {/* Action Buttons */}
         <div className="no-print absolute top-6 left-6 right-6 flex items-center justify-between">
-          <button
+          <Button
             onClick={handleBack}
-            className="bg-white/90 backdrop-blur-sm hover:bg-white p-3 rounded-full shadow-lg transition-all hover:shadow-xl"
+            variant="secondary"
+            size="icon"
+            className="bg-background/90 backdrop-blur-sm hover:bg-background shadow-lg"
+            aria-label="Go back"
           >
-            <ArrowLeft className="w-5 h-5 text-slate-900" />
-          </button>
+            <ArrowLeft className="w-5 h-5" />
+          </Button>
           <div className="flex items-center gap-2">
             <FavoriteButton recipeId={id as string} variant="outline" />
             <ShareButton
@@ -199,11 +202,12 @@ const RecipeDetailPage: React.FC<RecipeDetailPageProps> = () => {
               recipeTitle={recipe.title}
               variant="outline"
             />
-            <Button
+              <Button
               variant="outline"
               size="default"
               onClick={() => window.print()}
-              className="bg-white/90 backdrop-blur-sm"
+              className="bg-background/90 backdrop-blur-sm"
+              aria-label="Print recipe"
             >
               <Printer className="h-4 w-4" />
             </Button>
@@ -281,10 +285,10 @@ const RecipeDetailPage: React.FC<RecipeDetailPageProps> = () => {
                   <Calendar className="w-6 h-6 text-purple-600 dark:text-purple-400" />
                 </div>
                 <div>
-                  <p className="text-sm text-slate-500 font-medium">
+                  <p className="text-sm text-muted-foreground font-medium">
                     Published
                   </p>
-                  <p className="text-lg font-bold text-slate-900">
+                  <p className="text-lg font-bold text-foreground">
                     {formatDate(recipe.createdAt)}
                   </p>
                 </div>
@@ -299,8 +303,8 @@ const RecipeDetailPage: React.FC<RecipeDetailPageProps> = () => {
             <Card className="shadow-lg border-0 sticky top-6">
               <CardContent className="p-6">
                 <div className="mb-4 flex items-center justify-between">
-                  <h2 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
-                    <ChefHat className="w-6 h-6 text-blue-600" />
+                  <h2 className="text-2xl font-bold text-foreground flex items-center gap-2">
+                    <ChefHat className="w-6 h-6 text-primary" />
                     Ingredients
                   </h2>
                   <ShoppingListButton
@@ -312,9 +316,9 @@ const RecipeDetailPage: React.FC<RecipeDetailPageProps> = () => {
                   {recipe.ingredients.map((ingredient, index) => (
                     <li
                       key={index}
-                      className="flex items-start gap-3 text-slate-700"
+                      className="flex items-start gap-3 text-foreground"
                     >
-                      <div className="w-2 h-2 bg-blue-600 rounded-full mt-2 flex-shrink-0" />
+                      <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0" />
                       <span className="leading-relaxed">{ingredient}</span>
                     </li>
                   ))}
@@ -328,7 +332,7 @@ const RecipeDetailPage: React.FC<RecipeDetailPageProps> = () => {
             {/* Steps */}
             <Card className="shadow-lg border-0">
               <CardContent className="p-6">
-                <h2 className="text-2xl font-bold text-slate-900 mb-6">
+                <h2 className="text-2xl font-bold text-foreground mb-6">
                   Instructions
                 </h2>
                 <div className="space-y-4">
@@ -337,16 +341,25 @@ const RecipeDetailPage: React.FC<RecipeDetailPageProps> = () => {
                       key={index}
                       className={`flex gap-4 p-4 rounded-lg transition-all cursor-pointer ${
                         checkedSteps.has(index)
-                          ? "bg-green-50 border-2 border-green-200"
-                          : "bg-slate-50 border-2 border-transparent hover:border-slate-200"
+                          ? "bg-green-50 dark:bg-green-950/30 border-2 border-green-200 dark:border-green-800"
+                          : "bg-muted border-2 border-transparent hover:border-border"
                       }`}
                       onClick={() => toggleStep(index)}
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          toggleStep(index);
+                        }
+                      }}
+                      aria-pressed={checkedSteps.has(index)}
                     >
                       <div className="flex-shrink-0">
                         {checkedSteps.has(index) ? (
-                          <CheckCircle2 className="w-6 h-6 text-green-600" />
+                          <CheckCircle2 className="w-6 h-6 text-green-600 dark:text-green-400" />
                         ) : (
-                          <div className="w-6 h-6 rounded-full bg-slate-300 flex items-center justify-center text-white text-sm font-bold">
+                          <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-sm font-bold">
                             {index + 1}
                           </div>
                         )}
@@ -354,8 +367,8 @@ const RecipeDetailPage: React.FC<RecipeDetailPageProps> = () => {
                       <p
                         className={`leading-relaxed ${
                           checkedSteps.has(index)
-                            ? "text-green-900 line-through"
-                            : "text-slate-700"
+                            ? "text-green-900 dark:text-green-100 line-through"
+                            : "text-foreground"
                         }`}
                       >
                         {step}
@@ -368,13 +381,13 @@ const RecipeDetailPage: React.FC<RecipeDetailPageProps> = () => {
 
             {/* Tips */}
             {recipe.tips && (
-              <Card className="shadow-lg border-0 bg-gradient-to-br from-amber-50 to-orange-50">
+              <Card className="shadow-lg border-0 bg-gradient-to-br from-amber-50/50 to-orange-50/50 dark:from-amber-950/20 dark:to-orange-950/20">
                 <CardContent className="p-6">
-                  <h2 className="text-2xl font-bold text-slate-900 mb-4 flex items-center gap-2">
-                    <Lightbulb className="w-6 h-6 text-amber-600" />
+                  <h2 className="text-2xl font-bold text-foreground mb-4 flex items-center gap-2">
+                    <Lightbulb className="w-6 h-6 text-amber-600 dark:text-amber-400" />
                     Pro Tips
                   </h2>
-                  <p className="text-slate-700 leading-relaxed">
+                  <p className="text-foreground leading-relaxed">
                     {recipe.tips}
                   </p>
                 </CardContent>
