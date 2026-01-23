@@ -144,11 +144,16 @@ const RecipeHomePage: React.FC = () => {
       return "bg-secondary text-secondary-foreground border-border hover:bg-secondary/80";
     }
     const colors: Record<Category, string> = {
-      [Category.BREAKFAST]: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300 border-amber-200 dark:border-amber-800 hover:bg-amber-200 dark:hover:bg-amber-900/50",
-      [Category.LUNCH]: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800 hover:bg-emerald-200 dark:hover:bg-emerald-900/50",
-      [Category.DINNER]: "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300 border-orange-200 dark:border-orange-800 hover:bg-orange-200 dark:hover:bg-orange-900/50",
-      [Category.DESSERT]: "bg-pink-100 text-pink-800 dark:bg-pink-900/30 dark:text-pink-300 border-pink-200 dark:border-pink-800 hover:bg-pink-200 dark:hover:bg-pink-900/50",
-      [Category.SNACK]: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300 border-purple-200 dark:border-purple-800 hover:bg-purple-200 dark:hover:bg-purple-900/50",
+      [Category.BREAKFAST]:
+        "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300 border-amber-200 dark:border-amber-800 hover:bg-amber-200 dark:hover:bg-amber-900/50",
+      [Category.LUNCH]:
+        "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800 hover:bg-emerald-200 dark:hover:bg-emerald-900/50",
+      [Category.DINNER]:
+        "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300 border-orange-200 dark:border-orange-800 hover:bg-orange-200 dark:hover:bg-orange-900/50",
+      [Category.DESSERT]:
+        "bg-pink-100 text-pink-800 dark:bg-pink-900/30 dark:text-pink-300 border-pink-200 dark:border-pink-800 hover:bg-pink-200 dark:hover:bg-pink-900/50",
+      [Category.SNACK]:
+        "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300 border-purple-200 dark:border-purple-800 hover:bg-purple-200 dark:hover:bg-purple-900/50",
     };
     return colors[category];
   };
@@ -215,15 +220,15 @@ const RecipeHomePage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="bg-background min-h-screen">
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="space-y-1">
-            <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+            <h1 className="text-foreground text-3xl font-bold tracking-tight sm:text-4xl">
               All Recipes
             </h1>
-            <p className="text-base text-muted-foreground sm:text-lg">
+            <p className="text-muted-foreground text-base sm:text-lg">
               Discover delicious recipes and enjoy cooking
             </p>
           </div>
@@ -232,20 +237,20 @@ const RecipeHomePage: React.FC = () => {
         <div className="mb-8 space-y-4">
           <div className="flex flex-col gap-4 sm:flex-row">
             <div className="relative flex-1">
-              <Search className="absolute right-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+              <Search className="text-muted-foreground pointer-events-none absolute top-1/2 right-3 h-5 w-5 -translate-y-1/2" />
               <Input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search recipes..."
-                className="pr-10 w-full"
+                className="w-full pr-10"
                 aria-label="Search recipes"
               />
             </div>
             <Button
               onClick={() => setShowFilters(!showFilters)}
               variant={showFilters ? "default" : "outline"}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 !px-5"
               aria-expanded={showFilters}
               aria-label="Toggle filters"
             >
@@ -259,7 +264,7 @@ const RecipeHomePage: React.FC = () => {
             <Card>
               <CardContent className="pt-6">
                 <div className="mb-4 flex items-center justify-between">
-                  <h3 className="text-base font-semibold text-foreground">
+                  <h3 className="text-foreground text-base font-semibold">
                     Filter by Category
                   </h3>
                   {(searchQuery || selectedCategory !== "ALL") && (
@@ -267,7 +272,7 @@ const RecipeHomePage: React.FC = () => {
                       onClick={clearFilters}
                       variant="ghost"
                       size="sm"
-                      className="flex items-center gap-1.5 text-primary hover:text-primary/90"
+                      className="text-primary hover:text-primary/90 flex items-center gap-1.5"
                       aria-label="Clear all filters"
                     >
                       <X className="h-4 w-4" />
@@ -325,21 +330,21 @@ const RecipeHomePage: React.FC = () => {
 
         {/* Results Count */}
         <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             {loading ? (
               "Loading recipes..."
             ) : (
               <>
                 Showing{" "}
-                <span className="font-semibold text-foreground">
+                <span className="text-foreground font-semibold">
                   {startIndex + 1}
                 </span>{" "}
                 -{" "}
-                <span className="font-semibold text-foreground">
+                <span className="text-foreground font-semibold">
                   {Math.min(endIndex, filteredRecipes.length)}
                 </span>{" "}
                 of{" "}
-                <span className="font-semibold text-foreground">
+                <span className="text-foreground font-semibold">
                   {filteredRecipes.length}
                 </span>{" "}
                 {filteredRecipes.length === 1 ? "recipe" : "recipes"}
@@ -347,13 +352,15 @@ const RecipeHomePage: React.FC = () => {
             )}
           </p>
           {!loading && totalPages > 1 && (
-            <p className="text-sm text-muted-foreground">
+            <p className="text-muted-foreground text-sm">
               Page{" "}
-              <span className="font-semibold text-foreground">
+              <span className="text-foreground font-semibold">
                 {currentPage}
               </span>{" "}
               of{" "}
-              <span className="font-semibold text-foreground">{totalPages}</span>
+              <span className="text-foreground font-semibold">
+                {totalPages}
+              </span>
             </p>
           )}
         </div>
@@ -362,7 +369,7 @@ const RecipeHomePage: React.FC = () => {
         {loading && (
           <div className="flex items-center justify-center py-20">
             <div className="text-center">
-              <Loader2 className="mx-auto mb-4 h-12 w-12 animate-spin text-primary" />
+              <Loader2 className="text-primary mx-auto mb-4 h-12 w-12 animate-spin" />
               <p className="text-muted-foreground">Loading recipes...</p>
             </div>
           </div>
@@ -371,13 +378,13 @@ const RecipeHomePage: React.FC = () => {
         {/* No Results */}
         {!loading && filteredRecipes.length === 0 && (
           <div className="py-20 text-center">
-            <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-muted">
-              <Search className="h-10 w-10 text-muted-foreground" />
+            <div className="bg-muted mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full">
+              <Search className="text-muted-foreground h-10 w-10" />
             </div>
-            <h3 className="mb-2 text-2xl font-bold text-foreground">
+            <h3 className="text-foreground mb-2 text-2xl font-bold">
               No recipes found
             </h3>
-            <p className="mb-6 text-muted-foreground">
+            <p className="text-muted-foreground mb-6">
               {searchQuery || selectedCategory !== "ALL"
                 ? "Try adjusting your filters or search query"
                 : "Be the first to create a recipe!"}
@@ -439,7 +446,7 @@ const RecipeHomePage: React.FC = () => {
                   ) : (
                     <span
                       key={index}
-                      className="px-2 text-muted-foreground"
+                      className="text-muted-foreground px-2"
                       aria-hidden="true"
                     >
                       {page}

@@ -88,7 +88,7 @@ const NavBarClient = ({ session }: { session: any }) => {
 
   return (
     <>
-      <nav className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
+      <nav className="bg-background/95 supports-backdrop-filter:bg-background/60 sticky top-0 z-50 border-b backdrop-blur">
         <div className="mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
             <div className="flex gap-5">
@@ -129,13 +129,13 @@ const NavBarClient = ({ session }: { session: any }) => {
             </div>
 
             {/* Desktop Actions */}
-            <div className="hidden items-center gap-3 md:flex">
+            <div className="hidden items-center gap-5 md:flex">
               <ThemeToggle />
               {session?.user ? (
                 <div className="flex place-content-center gap-5">
                   <Link
                     href="/create-recipe"
-                    className="inline-flex h-10 w-10 items-center justify-center gap-2 rounded-md bg-primary font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+                    className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex h-10 w-10 items-center justify-center gap-2 rounded-md font-semibold transition-colors"
                   >
                     <Plus className="flex h-5 w-5" />
                   </Link>
@@ -149,7 +149,7 @@ const NavBarClient = ({ session }: { session: any }) => {
               ) : (
                 <Link
                   href="/login"
-                  className="hover inline-flex items-center gap-2 rounded-lg border-2 border-border px-6 py-3 font-semibold transition-colors hover:bg-primary hover:text-primary-foreground"
+                  className="hover border-border hover:bg-primary hover:text-primary-foreground inline-flex items-center gap-2 rounded-lg border-2 px-6 py-3 font-semibold transition-colors"
                 >
                   <span className="hidden lg:inline">Login</span>
                 </Link>
@@ -191,7 +191,7 @@ const NavBarClient = ({ session }: { session: any }) => {
         {/* Mobile Menu */}
         <div
           className={clsx(
-            "fixed top-16 right-0 left-0 z-50 border-b bg-background shadow-lg transition-all duration-300 ease-in-out md:hidden",
+            "bg-background fixed top-16 right-0 left-0 z-50 border-b shadow-lg transition-all duration-300 ease-in-out md:hidden",
             mobileMenuOpen
               ? "translate-y-0 opacity-100"
               : "pointer-events-none -translate-y-full opacity-0",
@@ -223,7 +223,9 @@ const NavBarClient = ({ session }: { session: any }) => {
             {/* Mobile User Section */}
             <div className="border-t pt-4">
               <div className="mb-4 flex items-center justify-between px-4">
-                <span className="text-sm font-medium text-foreground/70">Theme</span>
+                <span className="text-foreground/70 text-sm font-medium">
+                  Theme
+                </span>
                 <ThemeToggle />
               </div>
               {session?.user ? (
@@ -252,7 +254,9 @@ const NavBarClient = ({ session }: { session: any }) => {
                     </div>
                   </div>
                   <button
-                    onClick={() => signOut({ redirect: true, callbackUrl: "/" })}
+                    onClick={() =>
+                      signOut({ redirect: true, callbackUrl: "/" })
+                    }
                     className={clsx(
                       "flex w-full justify-center",
                       buttonVariants({ variant: "outline" }),

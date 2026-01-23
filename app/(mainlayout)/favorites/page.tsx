@@ -55,7 +55,7 @@ export default function FavoritesPage() {
       const filtered = recipes.filter(
         (recipe) =>
           recipe.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          recipe.description.toLowerCase().includes(searchQuery.toLowerCase())
+          recipe.description.toLowerCase().includes(searchQuery.toLowerCase()),
       );
       setFilteredRecipes(filtered);
     } else {
@@ -75,7 +75,10 @@ export default function FavoritesPage() {
         }
         // If error, set empty array instead of throwing
         const errorData = await response.json().catch(() => ({}));
-        console.error("Failed to fetch favorites:", errorData.message || "Unknown error");
+        console.error(
+          "Failed to fetch favorites:",
+          errorData.message || "Unknown error",
+        );
         setRecipes([]);
         setFilteredRecipes([]);
         return;
@@ -104,7 +107,7 @@ export default function FavoritesPage() {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="flex items-center justify-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <Loader2 className="text-primary h-8 w-8 animate-spin" />
         </div>
       </div>
     );
@@ -113,19 +116,17 @@ export default function FavoritesPage() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
-        <div className="flex items-center gap-3 mb-2">
-          <Heart className="h-8 w-8 text-red-500 fill-red-500" />
+        <div className="mb-2 flex items-center gap-3">
+          <Heart className="h-8 w-8 fill-red-500 text-red-500" />
           <h1 className="text-3xl font-bold">My Favorites</h1>
         </div>
-        <p className="text-muted-foreground">
-          Your saved recipes collection
-        </p>
+        <p className="text-muted-foreground">Your saved recipes collection</p>
       </div>
 
       {/* Search */}
       <div className="mb-6">
-        <div className="relative max-w-md">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <div className="relative w-full">
+          <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform" />
           <Input
             placeholder="Search favorites..."
             value={searchQuery}
@@ -139,8 +140,8 @@ export default function FavoritesPage() {
       {filteredRecipes.length === 0 ? (
         <Card>
           <CardContent className="py-12 text-center">
-            <Heart className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-            <h3 className="text-xl font-semibold mb-2">No favorites yet</h3>
+            <Heart className="text-muted-foreground mx-auto mb-4 h-12 w-12" />
+            <h3 className="mb-2 text-xl font-semibold">No favorites yet</h3>
             <p className="text-muted-foreground mb-4">
               {searchQuery
                 ? "No recipes match your search"
@@ -149,7 +150,7 @@ export default function FavoritesPage() {
             {!searchQuery && (
               <button
                 onClick={() => router.push("/")}
-                className="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 font-semibold text-white transition-colors hover:bg-primary/90"
+                className="bg-primary hover:bg-primary/90 inline-flex items-center gap-2 rounded-lg px-6 py-3 font-semibold text-white transition-colors"
               >
                 Browse Recipes
               </button>
@@ -157,7 +158,7 @@ export default function FavoritesPage() {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 justify-items-start gap-6 md:grid-cols-2 lg:grid-cols-3">
           {filteredRecipes.map((recipe) => (
             <RecipeCard
               key={recipe.id}
