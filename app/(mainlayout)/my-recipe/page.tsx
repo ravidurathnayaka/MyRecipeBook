@@ -11,6 +11,7 @@ import {
   Search,
   Plus,
   AlertCircle,
+  BookOpen,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -93,7 +94,11 @@ const MyRecipesPage: React.FC = () => {
       const data = await response.json();
       console.log("Fetched recipes:", data);
       // API returns { recipes: [...], pagination: {...} }
-      const recipesArray = Array.isArray(data.recipes) ? data.recipes : (Array.isArray(data) ? data : []);
+      const recipesArray = Array.isArray(data.recipes)
+        ? data.recipes
+        : Array.isArray(data)
+          ? data
+          : [];
       setRecipes(recipesArray);
     } catch (error) {
       console.error("Error fetching recipes:", error);
@@ -221,7 +226,7 @@ const MyRecipesPage: React.FC = () => {
   // Auth check
   if (status === "loading") {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
+      <div className="bg-background flex min-h-screen items-center justify-center">
         <Loader2 className="h-12 w-12 animate-spin text-slate-600" />
       </div>
     );
@@ -252,13 +257,18 @@ const MyRecipesPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+    <div className="bg-background min-h-screen">
+      <div className="container mx-auto px-4 py-8 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">My Recipes</h1>
-            <p className="mt-1 text-muted-foreground">Manage your recipe collection</p>
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="mb-8">
+            <div className="mb-2 flex items-center gap-3">
+              <BookOpen className="text-primary h-8 w-8" />
+              <h1 className="text-3xl font-bold">My Recipes</h1>
+            </div>
+            <p className="text-muted-foreground">
+              Manage your recipe collection
+            </p>
           </div>
           <button
             onClick={handleCreateRecipe}
@@ -278,7 +288,7 @@ const MyRecipesPage: React.FC = () => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search your recipes..."
-              className="w-full rounded-lg border-2 border-input bg-background px-2 py-3 text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              className="border-input bg-background text-foreground placeholder:text-muted-foreground w-full rounded-lg border-2 px-2 py-3 focus:ring-2 focus:ring-blue-500 focus:outline-none"
             />
           </div>
         </div>

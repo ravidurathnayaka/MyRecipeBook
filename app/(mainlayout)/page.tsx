@@ -221,9 +221,9 @@ const RecipeHomePage: React.FC = () => {
 
   return (
     <div className="bg-background min-h-screen">
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      <div className="container mx-auto px-4 py-8 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="space-y-1">
             <h1 className="text-foreground text-3xl font-bold tracking-tight sm:text-4xl">
               All Recipes
@@ -237,20 +237,20 @@ const RecipeHomePage: React.FC = () => {
         <div className="mb-8 space-y-4">
           <div className="flex flex-col gap-4 sm:flex-row">
             <div className="relative flex-1">
-              <Search className="text-muted-foreground pointer-events-none absolute top-1/2 right-3 h-5 w-5 -translate-y-1/2" />
+              <Search className="text-muted-foreground pointer-events-none absolute top-1/2 right-3 !h-10 w-5 -translate-y-1/2" />
               <Input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search recipes..."
-                className="w-full pr-10"
+                className="w-full pr-10 sm:!py-5"
                 aria-label="Search recipes"
               />
             </div>
             <Button
               onClick={() => setShowFilters(!showFilters)}
               variant={showFilters ? "default" : "outline"}
-              className="flex items-center gap-2 !px-5"
+              className="flex items-center gap-2 sm:!px-5 sm:py-5"
               aria-expanded={showFilters}
               aria-label="Toggle filters"
             >

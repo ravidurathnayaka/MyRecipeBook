@@ -126,12 +126,12 @@ export default function FavoritesPage() {
       {/* Search */}
       <div className="mb-6">
         <div className="relative w-full">
-          <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform" />
+          <Search className="text-muted-foreground absolute top-1/2 left-3 !h-10 w-4 -translate-y-1/2 transform" />
           <Input
             placeholder="Search favorites..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10"
+            className="pl-10 sm:!py-5"
           />
         </div>
       </div>

@@ -95,7 +95,7 @@ const NavBarClient = ({ session }: { session: any }) => {
               {/* Logo */}
               <Link href="/" className="flex shrink-0 items-center gap-2">
                 <ChefHat className="text-primary h-8 w-8 sm:h-10 sm:w-10" />
-                <h1 className="text-xl font-bold sm:text-2xl">RecipeBook</h1>
+                <h1 className="text-xl font-bold sm:text-2xl">MyRecipeBook</h1>
               </Link>
 
               {/* Desktop Navigation */}
