@@ -122,7 +122,7 @@ export async function POST(request: NextRequest) {
         steps: body.steps,
         tips: body.tips,
         category: body.category,
-        imageUrl: body.imageUrl,
+        imageUrl: body.imageUrl as string | null,
         authorId: body.authorId,
         status: "PENDING",
       },

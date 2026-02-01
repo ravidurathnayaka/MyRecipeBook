@@ -187,6 +187,13 @@ export function RecipeForm({
     setFormData((prev) => ({ ...prev, steps: newSteps }));
   };
 
+  const removeStep = (index: number) => {
+    if (formData.steps.length > 1) {
+      const newSteps = formData.steps.filter((_, i) => i !== index);
+      setFormData((prev) => ({ ...prev, steps: newSteps }));
+    }
+  };
+
   const handleImageUrlChange = (url: string) => {
     setFormData((prev) => ({ ...prev, imageUrl: url }));
     setImagePreview(url);
