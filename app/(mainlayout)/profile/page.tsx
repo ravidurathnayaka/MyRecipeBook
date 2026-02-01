@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useSession } from "next-auth/react";
+import { toast } from "sonner";
 
 interface UserProfile {
   id: string;
@@ -155,6 +156,7 @@ export default function ProfilePage() {
       setProfile(updatedProfile);
       setEditing(false);
       setSuccess(true);
+      toast.success("Profile updated successfully");
 
       // Refresh session to get updated user data
       if (session) {
@@ -162,12 +164,12 @@ export default function ProfilePage() {
       }
     } catch (error) {
       console.error("Error updating profile:", error);
-      setErrors({
-        submit:
-          error instanceof Error
-            ? error.message
-            : "Failed to update profile. Please try again.",
-      });
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Failed to update profile. Please try again.";
+      setErrors({ submit: message });
+      toast.error(message);
     } finally {
       setSaving(false);
     }
@@ -175,9 +177,9 @@ export default function ProfilePage() {
 
   if (status === "loading" || loading) {
     return (
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="flex items-center justify-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <Loader2 className="h-10 w-10 animate-spin text-primary" />
         </div>
       </div>
     );
@@ -185,7 +187,7 @@ export default function ProfilePage() {
 
   if (!profile) {
     return (
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <Card>
           <CardContent className="py-12 text-center">
             <p className="text-muted-foreground">Failed to load profile</p>
@@ -196,7 +198,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
+    <div className="container mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-2">
           <User className="h-8 w-8 text-primary" />
@@ -290,7 +292,7 @@ export default function ProfilePage() {
                     disabled={saving}
                   >
                     {saving ? (
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin text-primary" />
                     ) : (
                       <Save className="h-4 w-4 mr-2" />
                     )}

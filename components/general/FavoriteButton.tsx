@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Heart, Loader2 } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 
 interface FavoriteButtonProps {
@@ -59,6 +60,9 @@ export function FavoriteButton({
         });
         if (response.ok) {
           setIsFavorite(false);
+          toast.success("Removed from favorites");
+        } else {
+          toast.error("Failed to remove from favorites");
         }
       } else {
         const response = await fetch("/api/favorites", {
@@ -70,10 +74,14 @@ export function FavoriteButton({
         });
         if (response.ok) {
           setIsFavorite(true);
+          toast.success("Added to favorites");
+        } else {
+          toast.error("Failed to add to favorites");
         }
       }
     } catch (error) {
       console.error("Error toggling favorite:", error);
+      toast.error("Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -82,7 +90,7 @@ export function FavoriteButton({
   if (checking) {
     return (
       <Button variant={variant} size={size} disabled>
-        <Loader2 className="h-4 w-4 animate-spin" />
+        <Loader2 className="h-4 w-4 animate-spin text-primary" />
       </Button>
     );
   }
@@ -103,7 +111,7 @@ export function FavoriteButton({
       className={sizeClasses[size]}
     >
       {loading ? (
-        <Loader2 className="h-4 w-4 animate-spin" />
+        <Loader2 className="h-4 w-4 animate-spin text-primary" />
       ) : (
         <Heart
           className={`h-4 w-4 ${

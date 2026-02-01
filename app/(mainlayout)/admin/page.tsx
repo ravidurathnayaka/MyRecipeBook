@@ -8,21 +8,16 @@ import { Badge } from "@/components/ui/badge";
 export default async function AdminDashboard() {
   await requireAdmin();
 
-  const [
-    totalUsers,
-    totalRecipes,
-    pendingRecipes,
-    approvedRecipes,
-    rejectedRecipes,
-    superAdminCount,
-  ] = await Promise.all([
-    prisma.user.count(),
-    prisma.recipe.count(),
-    prisma.recipe.count({ where: { status: "PENDING" } }),
-    prisma.recipe.count({ where: { status: "APPROVED" } }),
-    prisma.recipe.count({ where: { status: "REJECTED" } }),
-    prisma.user.count({ where: { role: "SUPER_ADMIN" } }),
-  ]);
+  // Single transaction for faster loading - all counts in one round trip
+  const [totalUsers, totalRecipes, pendingRecipes, approvedRecipes, rejectedRecipes, superAdminCount] =
+    await prisma.$transaction([
+      prisma.user.count(),
+      prisma.recipe.count(),
+      prisma.recipe.count({ where: { status: "PENDING" } }),
+      prisma.recipe.count({ where: { status: "APPROVED" } }),
+      prisma.recipe.count({ where: { status: "REJECTED" } }),
+      prisma.user.count({ where: { role: "SUPER_ADMIN" } }),
+    ]);
 
   const stats = [
     {
@@ -60,7 +55,7 @@ export default async function AdminDashboard() {
   ];
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-2">
           <Shield className="h-8 w-8 text-primary" />

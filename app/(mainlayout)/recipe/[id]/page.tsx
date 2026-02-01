@@ -53,14 +53,8 @@ interface Recipe {
   updatedAt: string;
 }
 
-interface RecipeDetailPageProps {
-  recipeId: string;
-}
-
-const RecipeDetailPage: React.FC<RecipeDetailPageProps> = () => {
+export default function RecipeDetailPage() {
   const { id } = useParams<{ id: string }>();
-
-  console.log(id);
   const router = useRouter();
   const [recipe, setRecipe] = useState<Recipe | null>(null);
   const [loading, setLoading] = useState(true);
@@ -134,7 +128,7 @@ const RecipeDetailPage: React.FC<RecipeDetailPageProps> = () => {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="w-12 h-12 animate-spin text-muted-foreground mx-auto mb-4" />
+          <Loader2 className="h-10 w-10 animate-spin text-primary mx-auto mb-4" />
           <p className="text-muted-foreground">Loading recipe...</p>
         </div>
       </div>
@@ -173,7 +167,7 @@ const RecipeDetailPage: React.FC<RecipeDetailPageProps> = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Hero Section */}
-      <div className="relative h-96 w-full">
+      <div className="recipe-hero relative h-96 w-full">
         <img
           src={
             recipe.imageUrl ||
@@ -182,7 +176,7 @@ const RecipeDetailPage: React.FC<RecipeDetailPageProps> = () => {
           alt={recipe.title}
           className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent recipe-hero-overlay" />
 
         {/* Action Buttons */}
         <div className="no-print absolute top-6 left-6 right-6 flex items-center justify-between">
@@ -202,11 +196,11 @@ const RecipeDetailPage: React.FC<RecipeDetailPageProps> = () => {
               recipeTitle={recipe.title}
               variant="outline"
             />
-              <Button
+            <Button
               variant="outline"
-              size="default"
+              size="icon"
               onClick={() => window.print()}
-              className="bg-background/90 backdrop-blur-sm"
+              className="h-10 w-10 bg-background/90 backdrop-blur-sm"
               aria-label="Print recipe"
             >
               <Printer className="h-4 w-4" />
@@ -215,7 +209,7 @@ const RecipeDetailPage: React.FC<RecipeDetailPageProps> = () => {
         </div>
 
         {/* Title Overlay */}
-        <div className="absolute bottom-0 left-0 right-0 p-8 text-white">
+        <div className="recipe-title-overlay absolute bottom-0 left-0 right-0 p-8 text-white">
           <div className="max-w-5xl mx-auto">
             <Badge
               className={`${getCategoryColor(
@@ -237,7 +231,7 @@ const RecipeDetailPage: React.FC<RecipeDetailPageProps> = () => {
       {/* Content */}
       <div className="max-w-5xl mx-auto px-8 py-12">
         {/* Meta Information */}
-        <Card className="mb-8 shadow-lg border-0">
+        <Card className="mb-8 shadow-lg border-0 print-break-inside-avoid">
           <CardContent className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {recipe.makeTime && (
@@ -300,17 +294,19 @@ const RecipeDetailPage: React.FC<RecipeDetailPageProps> = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Ingredients */}
           <div className="lg:col-span-1">
-            <Card className="shadow-lg border-0 sticky top-6">
+            <Card className="shadow-lg border-0 sticky top-6 print-break-inside-avoid">
               <CardContent className="p-6">
-                <div className="mb-4 flex items-center justify-between">
+                <div className="mb-4 flex flex-wrap items-center gap-3">
+                  <div className="shrink-0 no-print">
+                    <ShoppingListButton
+                      ingredients={recipe.ingredients}
+                      recipeTitle={recipe.title}
+                    />
+                  </div>
                   <h2 className="text-2xl font-bold text-foreground flex items-center gap-2">
-                    <ChefHat className="w-6 h-6 text-primary" />
+                    <ChefHat className="w-6 h-6 shrink-0 text-primary" />
                     Ingredients
                   </h2>
-                  <ShoppingListButton
-                    ingredients={recipe.ingredients}
-                    recipeTitle={recipe.title}
-                  />
                 </div>
                 <ul className="space-y-3">
                   {recipe.ingredients.map((ingredient, index) => (
@@ -330,7 +326,7 @@ const RecipeDetailPage: React.FC<RecipeDetailPageProps> = () => {
           {/* Steps and Tips */}
           <div className="lg:col-span-2 space-y-8">
             {/* Steps */}
-            <Card className="shadow-lg border-0">
+            <Card className="shadow-lg border-0 print-break-inside-avoid">
               <CardContent className="p-6">
                 <h2 className="text-2xl font-bold text-foreground mb-6">
                   Instructions
@@ -381,7 +377,7 @@ const RecipeDetailPage: React.FC<RecipeDetailPageProps> = () => {
 
             {/* Tips */}
             {recipe.tips && (
-              <Card className="shadow-lg border-0 bg-gradient-to-br from-amber-50/50 to-orange-50/50 dark:from-amber-950/20 dark:to-orange-950/20">
+              <Card className="shadow-lg border-0 bg-gradient-to-br from-amber-50/50 to-orange-50/50 dark:from-amber-950/20 dark:to-orange-950/20 print-break-inside-avoid">
                 <CardContent className="p-6">
                   <h2 className="text-2xl font-bold text-foreground mb-4 flex items-center gap-2">
                     <Lightbulb className="w-6 h-6 text-amber-600 dark:text-amber-400" />
@@ -398,6 +394,4 @@ const RecipeDetailPage: React.FC<RecipeDetailPageProps> = () => {
       </div>
     </div>
   );
-};
-
-export default RecipeDetailPage;
+}

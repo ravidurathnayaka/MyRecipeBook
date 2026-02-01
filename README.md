@@ -336,9 +336,18 @@ PATCH /api/admin/recipes
 
 ### Vercel Deployment
 
-1. Connect your repository to Vercel
-2. Configure environment variables in Vercel dashboard
-3. Deploy automatically on push to main branch
+1. **Connect repository** - Import from GitHub/GitLab/Bitbucket at [vercel.com/new](https://vercel.com/new)
+2. **Configure environment variables** in Vercel dashboard:
+   - `DATABASE_URL` - PostgreSQL with connection pooling (Neon, Supabase, Vercel Postgres)
+   - `AUTH_SECRET` - Generate: `openssl rand -base64 32`
+   - `AUTH_URL` - Your Vercel URL (e.g., `https://your-app.vercel.app`)
+   - `AUTH_TRUST_HOST` - Set to `true`
+   - `AUTH_GOOGLE_ID` and `AUTH_GOOGLE_SECRET` - Google OAuth credentials
+3. **Run database migrations**: `DATABASE_URL="your-url" pnpm prisma migrate deploy`
+4. **Create super admin**: `DATABASE_URL="your-url" pnpm create-admin your@email.com`
+5. Deploy automatically on push to main branch
+
+See [docs/VERCEL_DEPLOYMENT.md](./docs/VERCEL_DEPLOYMENT.md) for detailed instructions.
 
 ### Docker Deployment
 

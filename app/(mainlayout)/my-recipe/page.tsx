@@ -11,11 +11,25 @@ import {
   Search,
   Plus,
   AlertCircle,
+  AlertTriangle,
   BookOpen,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { useSession } from "next-auth/react";
+import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
 // Types
@@ -39,6 +53,13 @@ interface Recipe {
 }
 
 const RECIPES_PER_PAGE = 5;
+const MY_RECIPES_CACHE_DURATION_MS = 5 * 60 * 1000; // 5 minutes
+
+let myRecipesCache: {
+  userId: string;
+  data: Recipe[];
+  timestamp: number;
+} | null = null;
 
 const MyRecipesPage: React.FC = () => {
   const { data: session, status } = useSession();
@@ -50,11 +71,21 @@ const MyRecipesPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [recipeToDelete, setRecipeToDelete] = useState<Recipe | null>(null);
 
   useEffect(() => {
-    if (status === "authenticated") {
+    if (status === "authenticated" && session?.user?.id) {
+      const userId = session.user.id;
+      const cached =
+        myRecipesCache &&
+        myRecipesCache.userId === userId &&
+        Date.now() - myRecipesCache.timestamp < MY_RECIPES_CACHE_DURATION_MS;
+      if (cached && myRecipesCache) {
+        setRecipes(myRecipesCache.data);
+        setLoading(false);
+        return;
+      }
       fetchMyRecipes();
     } else if (status === "unauthenticated") {
       setLoading(false);
@@ -100,6 +131,13 @@ const MyRecipesPage: React.FC = () => {
           ? data
           : [];
       setRecipes(recipesArray);
+      if (session?.user?.id) {
+        myRecipesCache = {
+          userId: session.user.id,
+          data: recipesArray,
+          timestamp: Date.now(),
+        };
+      }
     } catch (error) {
       console.error("Error fetching recipes:", error);
       setRecipes([]); // Set empty array on error to prevent iteration errors
@@ -137,7 +175,7 @@ const MyRecipesPage: React.FC = () => {
 
   const handleDeleteClick = (recipe: Recipe) => {
     setRecipeToDelete(recipe);
-    setShowDeleteModal(true);
+    setDeleteDialogOpen(true);
   };
 
   const handleDeleteConfirm = async () => {
@@ -153,12 +191,22 @@ const MyRecipesPage: React.FC = () => {
         throw new Error("Failed to delete recipe");
       }
 
-      setRecipes(recipes.filter((r) => r.id !== recipeToDelete.id));
-      setShowDeleteModal(false);
+      const updatedRecipes = recipes.filter((r) => r.id !== recipeToDelete.id);
+      setRecipes(updatedRecipes);
+      if (session?.user?.id && myRecipesCache?.userId === session.user.id) {
+        myRecipesCache = {
+          userId: session.user.id,
+          data: updatedRecipes,
+          timestamp: Date.now(),
+        };
+      }
+      setDeleteDialogOpen(false);
       setRecipeToDelete(null);
     } catch (error) {
       console.error("Error deleting recipe:", error);
-      alert("Failed to delete recipe. Please try again.");
+      setDeleteDialogOpen(false);
+      setRecipeToDelete(null);
+      toast.error("Failed to delete recipe. Please try again.");
     } finally {
       setDeletingId(null);
     }
@@ -227,7 +275,7 @@ const MyRecipesPage: React.FC = () => {
   if (status === "loading") {
     return (
       <div className="bg-background flex min-h-screen items-center justify-center">
-        <Loader2 className="h-12 w-12 animate-spin text-slate-600" />
+        <Loader2 className="h-10 w-10 animate-spin text-primary" />
       </div>
     );
   }
@@ -258,7 +306,7 @@ const MyRecipesPage: React.FC = () => {
 
   return (
     <div className="bg-background min-h-screen">
-      <div className="container mx-auto px-4 py-8 sm:px-6 lg:px-8">
+      <div className="container mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="mb-8">
@@ -270,25 +318,26 @@ const MyRecipesPage: React.FC = () => {
               Manage your recipe collection
             </p>
           </div>
-          <button
+          <Button
             onClick={handleCreateRecipe}
-            className="flex items-center justify-center gap-2 rounded-lg bg-slate-900 px-6 py-3 font-semibold text-white shadow-md transition-colors hover:bg-slate-800"
+            className="flex items-center gap-2"
+            size="lg"
           >
             <Plus className="h-5 w-5" />
             Create Recipe
-          </button>
+          </Button>
         </div>
 
         {/* Search */}
         <div className="mb-6">
-          <div className="relative">
-            <Search className="absolute top-1/2 right-2 h-5 w-5 -translate-y-1/2 text-slate-400" />
-            <input
+          <div className="relative w-full">
+            <Search className="text-muted-foreground pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" />
+            <Input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search your recipes..."
-              className="border-input bg-background text-foreground placeholder:text-muted-foreground w-full rounded-lg border-2 px-2 py-3 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              className="h-10 w-full pl-10"
             />
           </div>
         </div>
@@ -313,7 +362,7 @@ const MyRecipesPage: React.FC = () => {
         {/* Loading */}
         {loading && (
           <div className="flex items-center justify-center py-20">
-            <Loader2 className="h-12 w-12 animate-spin text-slate-600" />
+            <Loader2 className="h-10 w-10 animate-spin text-primary" />
           </div>
         )}
 
@@ -333,13 +382,14 @@ const MyRecipesPage: React.FC = () => {
                   : "Start by creating your first recipe!"}
               </p>
               {!searchQuery && (
-                <button
+                <Button
                   onClick={handleCreateRecipe}
-                  className="inline-flex items-center gap-2 rounded-lg bg-slate-900 px-6 py-3 font-semibold text-white transition-colors hover:bg-slate-800"
+                  className="inline-flex items-center gap-2"
+                  size="lg"
                 >
                   <Plus className="h-5 w-5" />
                   Create Recipe
-                </button>
+                </Button>
               )}
             </CardContent>
           </Card>
@@ -432,7 +482,7 @@ const MyRecipesPage: React.FC = () => {
                                 title="Delete"
                               >
                                 {deletingId === recipe.id ? (
-                                  <Loader2 className="h-5 w-5 animate-spin" />
+                                  <Loader2 className="h-4 w-4 animate-spin text-primary" />
                                 ) : (
                                   <Trash2 className="h-5 w-5" />
                                 )}
@@ -495,7 +545,7 @@ const MyRecipesPage: React.FC = () => {
                           className="rounded-lg p-2 text-red-600 transition-colors hover:bg-red-50"
                         >
                           {deletingId === recipe.id ? (
-                            <Loader2 className="h-5 w-5 animate-spin" />
+                            <Loader2 className="h-4 w-4 animate-spin text-primary" />
                           ) : (
                             <Trash2 className="h-5 w-5" />
                           )}
@@ -551,58 +601,56 @@ const MyRecipesPage: React.FC = () => {
         )}
       </div>
 
-      {/* Delete Confirmation Modal */}
-      {showDeleteModal && recipeToDelete && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <Card className="w-full max-w-md border-0 shadow-2xl">
-            <CardContent className="p-6">
-              <div className="mb-4 flex items-start gap-4">
-                <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100">
-                  <AlertCircle className="h-6 w-6 text-red-600" />
-                </div>
-                <div>
-                  <h3 className="mb-2 text-xl font-bold text-slate-900">
-                    Delete Recipe
-                  </h3>
-                  <p className="text-slate-600">
-                    Are you sure you want to delete "
-                    <span className="font-semibold">
-                      {recipeToDelete.title}
-                    </span>
-                    "? This action cannot be undone.
-                  </p>
-                </div>
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent className="sm:max-w-md">
+          <AlertDialogHeader>
+            <div className="flex items-center gap-3">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-destructive/10">
+                <AlertTriangle className="h-6 w-6 text-destructive" />
               </div>
-              <div className="flex justify-end gap-3">
-                <button
-                  onClick={() => {
-                    setShowDeleteModal(false);
-                    setRecipeToDelete(null);
-                  }}
-                  disabled={deletingId !== null}
-                  className="rounded-lg px-4 py-2 font-semibold text-slate-700 transition-colors hover:bg-slate-100"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleDeleteConfirm}
-                  disabled={deletingId !== null}
-                  className="flex items-center gap-2 rounded-lg bg-red-600 px-4 py-2 font-semibold text-white transition-colors hover:bg-red-700 disabled:opacity-50"
-                >
-                  {deletingId ? (
-                    <>
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                      Deleting...
-                    </>
-                  ) : (
-                    "Delete"
-                  )}
-                </button>
+              <div className="flex-1">
+                <AlertDialogTitle>Delete Recipe</AlertDialogTitle>
+                <AlertDialogDescription className="mt-1.5">
+                  Are you sure you want to delete &quot;
+                  <span className="font-semibold text-foreground">
+                    {recipeToDelete?.title}
+                  </span>
+                  &quot;? This action cannot be undone.
+                </AlertDialogDescription>
               </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
+            </div>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="mt-6 flex-row gap-2 sm:gap-2">
+            <AlertDialogCancel
+              onClick={() => setRecipeToDelete(null)}
+              disabled={deletingId !== null}
+              className="mt-0"
+            >
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => {
+                e.preventDefault();
+                handleDeleteConfirm();
+              }}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              disabled={deletingId !== null}
+            >
+              {deletingId ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                  Deleting...
+                </>
+              ) : (
+                <>
+                  <Trash2 className="h-4 w-4" />
+                  Delete
+                </>
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

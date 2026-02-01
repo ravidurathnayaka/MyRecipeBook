@@ -4,6 +4,8 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
+  --color-footer: #f97316;
+  --color-footer-dark: #ea580c;
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -45,6 +47,7 @@
 }
 
 :root {
+  --footer-bg: #f97316;
   --radius: 0.65rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.141 0.005 285.823);
@@ -80,6 +83,8 @@
 }
 
 .dark {
+  --footer-bg: #ea580c;
+  --color-footer: var(--color-footer-dark);
   --background: oklch(0.141 0.005 285.823);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.21 0.006 285.885);
@@ -122,6 +127,86 @@
   }
 }
 
-footer {
-  background-color: #101828 !important;
+/* Print styles for recipe PDF */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  body {
+    background: white !important;
+    color: black !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Remove sticky positioning for print */
+  [class*="sticky"] {
+    position: static !important;
+  }
+
+  /* Avoid page breaks inside cards/sections */
+  .print\:break-inside-avoid,
+  .print-break-inside-avoid {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  /* Reset card backgrounds for clean print */
+  [class*="bg-background"],
+  [class*="bg-card"],
+  [class*="bg-muted"],
+  [class*="bg-secondary"] {
+    background: white !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Keep borders visible */
+  [class*="border"] {
+    border-color: #e5e7eb !important;
+  }
+
+  /* Ensure images print */
+  img {
+    max-width: 100% !important;
+    height: auto !important;
+  }
+
+  /* Recipe hero - compact and readable for print */
+  .recipe-hero {
+    min-height: 0 !important;
+    height: auto !important;
+  }
+
+  .recipe-hero img {
+    max-height: 180px !important;
+  }
+
+  .recipe-hero-overlay {
+    background: linear-gradient(
+      to top,
+      rgba(255, 255, 255, 0.95),
+      rgba(255, 255, 255, 0.7),
+      transparent
+    ) !important;
+  }
+
+  /* Recipe title overlay - dark text for print */
+  .recipe-title-overlay,
+  .recipe-title-overlay * {
+    color: #1f2937 !important;
+    text-shadow: none !important;
+  }
+
+  .recipe-title-overlay p {
+    color: #374151 !important;
+  }
+
+  /* Badge in hero - ensure readable */
+  .recipe-title-overlay span:first-child {
+    background: #e5e7eb !important;
+    color: #1f2937 !important;
+    border-color: #d1d5db !important;
+  }
 }

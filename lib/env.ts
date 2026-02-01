@@ -7,25 +7,25 @@ import { z } from "zod";
 const envSchema = z.object({
   // Database (required)
   DATABASE_URL: z.string().url("DATABASE_URL must be a valid URL"),
-  
+
   // NextAuth
   AUTH_SECRET: z.string().min(32, "AUTH_SECRET must be at least 32 characters").optional(),
   AUTH_URL: z.string().url().optional().or(z.literal("")),
   AUTH_TRUST_HOST: z.union([z.string().transform((val) => val === "true"), z.boolean()]).optional(),
-  
+
   // Google OAuth (optional in development, required in production)
   AUTH_GOOGLE_ID: z.string().min(1).optional(),
   AUTH_GOOGLE_SECRET: z.string().min(1).optional(),
-  
+
   // Optional: Super Admin email
   SUPER_ADMIN_EMAIL: z.string().email().optional(),
-  
+
   // Node Environment
   NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
-  
+
   // Optional: Sentry
   SENTRY_DSN: z.string().url().optional(),
-  
+
   // Optional: Logging
   LOG_LEVEL: z.enum(["debug", "info", "warn", "error"]).default("info"),
 });
@@ -59,6 +59,16 @@ function getEnv() {
       }
       if (!parsed.AUTH_GOOGLE_ID || !parsed.AUTH_GOOGLE_SECRET) {
         console.warn("⚠️  WARNING: Google OAuth credentials not set. Authentication will not work.");
+      }
+    }
+
+    // Production: require AUTH_SECRET and Google OAuth
+    if (!isDevelopment) {
+      if (!parsed.AUTH_SECRET) {
+        throw new Error("AUTH_SECRET is required in production. Generate with: openssl rand -base64 32");
+      }
+      if (!parsed.AUTH_GOOGLE_ID || !parsed.AUTH_GOOGLE_SECRET) {
+        throw new Error("AUTH_GOOGLE_ID and AUTH_GOOGLE_SECRET are required in production for authentication");
       }
     }
 

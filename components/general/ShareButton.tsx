@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Share2, Copy, Check, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -39,9 +40,11 @@ export function ShareButton({
       const url = getRecipeUrl();
       await navigator.clipboard.writeText(url);
       setCopied(true);
+      toast.success("Link copied to clipboard");
       setTimeout(() => setCopied(false), 2000);
     } catch (error) {
       console.error("Failed to copy link:", error);
+      toast.error("Failed to copy link");
     } finally {
       setLoading(false);
     }
@@ -60,7 +63,10 @@ export function ShareButton({
         });
       } catch (error) {
         // User cancelled or error occurred
-        console.error("Error sharing:", error);
+        if ((error as Error)?.name !== "AbortError") {
+          console.error("Error sharing:", error);
+          toast.error("Failed to share");
+        }
       }
     } else {
       // Fallback to copy if share API not available
@@ -80,7 +86,7 @@ export function ShareButton({
       <DropdownMenuTrigger asChild>
         <Button variant={variant} size={size} className={sizeClasses[size]}>
           {loading ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
+            <Loader2 className="h-4 w-4 animate-spin text-primary" />
           ) : copied ? (
             <Check className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
           ) : (

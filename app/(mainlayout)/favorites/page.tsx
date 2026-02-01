@@ -31,6 +31,14 @@ interface Recipe {
   updatedAt: string;
 }
 
+const FAVORITES_CACHE_DURATION_MS = 5 * 60 * 1000; // 5 minutes
+
+let favoritesCache: {
+  userId: string;
+  data: Recipe[];
+  timestamp: number;
+} | null = null;
+
 export default function FavoritesPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -45,10 +53,21 @@ export default function FavoritesPage() {
       return;
     }
 
-    if (status === "authenticated") {
+    if (status === "authenticated" && session?.user?.id) {
+      const userId = session.user.id;
+      const cached =
+        favoritesCache &&
+        favoritesCache.userId === userId &&
+        Date.now() - favoritesCache.timestamp < FAVORITES_CACHE_DURATION_MS;
+      if (cached && favoritesCache) {
+        setRecipes(favoritesCache.data);
+        setFilteredRecipes(favoritesCache.data);
+        setLoading(false);
+        return;
+      }
       fetchFavorites();
     }
-  }, [status, router]);
+  }, [status, session, router]);
 
   useEffect(() => {
     if (searchQuery) {
@@ -85,10 +104,16 @@ export default function FavoritesPage() {
       }
 
       const data = await response.json();
-      // Ensure data is an array
       const recipesArray = Array.isArray(data) ? data : [];
       setRecipes(recipesArray);
       setFilteredRecipes(recipesArray);
+      if (session?.user?.id) {
+        favoritesCache = {
+          userId: session.user.id,
+          data: recipesArray,
+          timestamp: Date.now(),
+        };
+      }
     } catch (error) {
       console.error("Error fetching favorites:", error);
       // Set empty arrays on error to prevent crashes
@@ -103,18 +128,18 @@ export default function FavoritesPage() {
     router.push(`/recipe/${recipeId}`);
   };
 
-  if (status === "loading" || loading) {
+  if (status === "loading" || status === "unauthenticated") {
     return (
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="flex items-center justify-center py-12">
-          <Loader2 className="text-primary h-8 w-8 animate-spin" />
+          <Loader2 className="text-primary h-10 w-10 animate-spin" />
         </div>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       <div className="mb-8">
         <div className="mb-2 flex items-center gap-3">
           <Heart className="h-8 w-8 fill-red-500 text-red-500" />
@@ -126,18 +151,22 @@ export default function FavoritesPage() {
       {/* Search */}
       <div className="mb-6">
         <div className="relative w-full">
-          <Search className="text-muted-foreground absolute top-1/2 left-3 !h-10 w-4 -translate-y-1/2 transform" />
+          <Search className="text-muted-foreground pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" />
           <Input
             placeholder="Search favorites..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 sm:!py-5"
+            className="h-10 w-full pl-10"
           />
         </div>
       </div>
 
-      {/* Recipes Grid */}
-      {filteredRecipes.length === 0 ? (
+      {/* Recipes Grid / Loading / Empty */}
+      {loading ? (
+        <div className="flex min-h-[200px] items-center justify-center">
+          <Loader2 className="text-primary h-10 w-10 animate-spin" />
+        </div>
+      ) : filteredRecipes.length === 0 ? (
         <Card>
           <CardContent className="py-12 text-center">
             <Heart className="text-muted-foreground mx-auto mb-4 h-12 w-12" />

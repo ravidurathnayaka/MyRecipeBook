@@ -4,12 +4,22 @@ import { z } from "zod";
 export const createRecipeSchema = z.object({
   title: z.string().min(1, "Title is required").max(200, "Title must be less than 200 characters"),
   description: z.string().min(10, "Description must be at least 10 characters").max(2000, "Description must be less than 2000 characters"),
-  makeTime: z.number().int().positive().max(1440).optional().nullable(), // Max 24 hours in minutes
+  makeTime: z
+    .union([
+      z.number().int().min(0, "Make time must be 0 or positive").max(1440, "Make time must be at most 1440 minutes"),
+      z.nan(),
+    ])
+    .optional()
+    .nullable()
+    .transform((v) => (v === undefined || v === null || Number.isNaN(v) ? null : v)),
   ingredients: z.array(z.string().min(1, "Ingredient cannot be empty")).min(1, "At least one ingredient is required").max(50, "Maximum 50 ingredients"),
   steps: z.array(z.string().min(1, "Step cannot be empty")).min(1, "At least one step is required").max(100, "Maximum 100 steps"),
   tips: z.string().max(1000).optional().nullable(),
   category: z.enum(["BREAKFAST", "LUNCH", "DINNER", "DESSERT", "SNACK"]),
-  imageUrl: z.string().url("Invalid image URL").max(500).optional().nullable(),
+  imageUrl: z.preprocess(
+    (val) => (val === "" || val === undefined || val === null ? null : val),
+    z.string().url("Invalid image URL").max(500).nullable()
+  ),
   authorId: z.string().min(1, "Author ID is required"),
 });
 

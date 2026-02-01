@@ -72,21 +72,32 @@ export function ShoppingListButton({
 
   if (!open) {
     return (
-      <Button variant="outline" size="sm" onClick={() => setOpen(true)}>
-        <ShoppingCart className="h-4 w-4 mr-2" />
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => setOpen(true)}
+        className="shrink-0 !px-4 whitespace-nowrap"
+        aria-label="Open shopping list"
+      >
+        <ShoppingCart className="h-4 w-4 shrink-0 mr-2" />
         Shopping List
       </Button>
     );
   }
 
   return (
-    <Card className="fixed inset-x-4 top-20 z-50 max-h-[80vh] overflow-y-auto shadow-2xl md:left-1/2 md:w-full md:max-w-2xl md:-translate-x-1/2">
+    <Card className="no-print fixed left-4 right-4 top-20 z-50 max-h-[80vh] overflow-y-auto shadow-2xl sm:left-1/2 sm:right-auto sm:w-full sm:max-w-2xl sm:-translate-x-1/2">
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle>Shopping List: {recipeTitle}</CardTitle>
           <div className="flex gap-2">
-            <Button variant="outline" size="sm" onClick={printList}>
-              <Download className="h-4 w-4 mr-2" />
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={printList}
+              style={{ paddingLeft: "1rem", paddingRight: "1rem" }}
+            >
+              <Download className="h-4 w-4 mr-2 shrink-0" />
               Print
             </Button>
             <Button variant="ghost" size="sm" onClick={() => setOpen(false)}>
@@ -110,7 +121,7 @@ export function ShoppingListButton({
                 onClick={() => toggleItem(index)}
               >
                 <div
-                  className={`flex-shrink-0 w-5 h-5 rounded border-2 flex items-center justify-center ${
+                  className={`shrink-0 w-5 h-5 rounded border-2 flex items-center justify-center ${
                     checked
                       ? "bg-emerald-600 dark:bg-emerald-500 border-emerald-600 dark:border-emerald-500"
                       : "border-border"

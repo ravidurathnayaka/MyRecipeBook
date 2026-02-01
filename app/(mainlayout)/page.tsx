@@ -55,6 +55,9 @@ interface Recipe {
 }
 
 const RECIPES_PER_PAGE = 6;
+const RECIPES_CACHE_DURATION_MS = 5 * 60 * 1000; // 5 minutes
+
+let recipesCache: { data: Recipe[]; timestamp: number } | null = null;
 
 const RecipeHomePage: React.FC = () => {
   const { data: session } = useSession();
@@ -62,20 +65,28 @@ const RecipeHomePage: React.FC = () => {
   const [filteredRecipes, setFilteredRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<Category | "ALL">(
-    "ALL",
+  const [selectedCategories, setSelectedCategories] = useState<Set<Category>>(
+    new Set(),
   );
   const [showFilters, setShowFilters] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
+    const cached =
+      recipesCache &&
+      Date.now() - recipesCache.timestamp < RECIPES_CACHE_DURATION_MS;
+    if (cached && recipesCache) {
+      setRecipes(recipesCache.data);
+      setLoading(false);
+      return;
+    }
     fetchRecipes();
   }, []);
 
   useEffect(() => {
     filterRecipes();
     setCurrentPage(1); // Reset to first page when filters change
-  }, [recipes, searchQuery, selectedCategory]);
+  }, [recipes, searchQuery, selectedCategories]);
 
   const fetchRecipes = async () => {
     try {
@@ -87,8 +98,9 @@ const RecipeHomePage: React.FC = () => {
       }
 
       const data = await response.json();
-      // API returns { recipes: [...], pagination: {...} }
-      setRecipes(data.recipes || []);
+      const recipesData = data.recipes || [];
+      setRecipes(recipesData);
+      recipesCache = { data: recipesData, timestamp: Date.now() };
     } catch (error) {
       console.error("Error fetching recipes:", error);
       setRecipes([]); // Set empty array on error to prevent iteration errors
@@ -114,10 +126,10 @@ const RecipeHomePage: React.FC = () => {
       );
     }
 
-    // Filter by category
-    if (selectedCategory !== "ALL") {
-      filtered = filtered.filter(
-        (recipe) => recipe.category === selectedCategory,
+    // Filter by category (show recipes matching ANY selected category)
+    if (selectedCategories.size > 0) {
+      filtered = filtered.filter((recipe) =>
+        selectedCategories.has(recipe.category),
       );
     }
 
@@ -136,7 +148,19 @@ const RecipeHomePage: React.FC = () => {
 
   const clearFilters = () => {
     setSearchQuery("");
-    setSelectedCategory("ALL");
+    setSelectedCategories(new Set());
+  };
+
+  const toggleCategory = (cat: Category) => {
+    setSelectedCategories((prev) => {
+      const next = new Set(prev);
+      if (next.has(cat)) {
+        next.delete(cat);
+      } else {
+        next.add(cat);
+      }
+      return next;
+    });
   };
 
   const getCategoryColor = (category: Category | "ALL"): string => {
@@ -221,7 +245,7 @@ const RecipeHomePage: React.FC = () => {
 
   return (
     <div className="bg-background min-h-screen">
-      <div className="container mx-auto px-4 py-8 sm:px-6 lg:px-8">
+      <div className="container mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="space-y-1">
@@ -237,20 +261,20 @@ const RecipeHomePage: React.FC = () => {
         <div className="mb-8 space-y-4">
           <div className="flex flex-col gap-4 sm:flex-row">
             <div className="relative flex-1">
-              <Search className="text-muted-foreground pointer-events-none absolute top-1/2 right-3 !h-10 w-5 -translate-y-1/2" />
+              <Search className="text-muted-foreground pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" />
               <Input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search recipes..."
-                className="w-full pr-10 sm:!py-5"
+                className="h-10 w-full pl-10"
                 aria-label="Search recipes"
               />
             </div>
             <Button
               onClick={() => setShowFilters(!showFilters)}
               variant={showFilters ? "default" : "outline"}
-              className="flex items-center gap-2 sm:!px-5 sm:py-5"
+              className="flex h-10 items-center gap-2 !px-4"
               aria-expanded={showFilters}
               aria-label="Toggle filters"
             >
@@ -267,7 +291,7 @@ const RecipeHomePage: React.FC = () => {
                   <h3 className="text-foreground text-base font-semibold">
                     Filter by Category
                   </h3>
-                  {(searchQuery || selectedCategory !== "ALL") && (
+                  {(searchQuery || selectedCategories.size > 0) && (
                     <Button
                       onClick={clearFilters}
                       variant="ghost"
@@ -283,20 +307,20 @@ const RecipeHomePage: React.FC = () => {
                 <div className="flex flex-wrap gap-2">
                   <Badge
                     className={`cursor-pointer border-2 transition-all ${
-                      selectedCategory === "ALL"
+                      selectedCategories.size === 0
                         ? getCategoryColor("ALL")
                         : "border-border bg-card text-muted-foreground hover:bg-accent hover:text-accent-foreground"
                     }`}
-                    onClick={() => setSelectedCategory("ALL")}
+                    onClick={() => setSelectedCategories(new Set())}
                     role="button"
                     tabIndex={0}
                     onKeyDown={(e) => {
                       if (e.key === "Enter" || e.key === " ") {
                         e.preventDefault();
-                        setSelectedCategory("ALL");
+                        setSelectedCategories(new Set());
                       }
                     }}
-                    aria-pressed={selectedCategory === "ALL"}
+                    aria-pressed={selectedCategories.size === 0}
                   >
                     ALL
                   </Badge>
@@ -304,20 +328,20 @@ const RecipeHomePage: React.FC = () => {
                     <Badge
                       key={cat}
                       className={`cursor-pointer border-2 transition-all ${
-                        selectedCategory === cat
+                        selectedCategories.has(cat)
                           ? getCategoryColor(cat)
                           : "border-border bg-card text-muted-foreground hover:bg-accent hover:text-accent-foreground"
                       }`}
-                      onClick={() => setSelectedCategory(cat)}
+                      onClick={() => toggleCategory(cat)}
                       role="button"
                       tabIndex={0}
                       onKeyDown={(e) => {
                         if (e.key === "Enter" || e.key === " ") {
                           e.preventDefault();
-                          setSelectedCategory(cat);
+                          toggleCategory(cat);
                         }
                       }}
-                      aria-pressed={selectedCategory === cat}
+                      aria-pressed={selectedCategories.has(cat)}
                     >
                       {cat}
                     </Badge>
@@ -369,7 +393,7 @@ const RecipeHomePage: React.FC = () => {
         {loading && (
           <div className="flex items-center justify-center py-20">
             <div className="text-center">
-              <Loader2 className="text-primary mx-auto mb-4 h-12 w-12 animate-spin" />
+              <Loader2 className="text-primary mx-auto mb-4 h-10 w-10 animate-spin" />
               <p className="text-muted-foreground">Loading recipes...</p>
             </div>
           </div>
@@ -385,7 +409,7 @@ const RecipeHomePage: React.FC = () => {
               No recipes found
             </h3>
             <p className="text-muted-foreground mb-6">
-              {searchQuery || selectedCategory !== "ALL"
+              {searchQuery || selectedCategories.size > 0
                 ? "Try adjusting your filters or search query"
                 : "Be the first to create a recipe!"}
             </p>
