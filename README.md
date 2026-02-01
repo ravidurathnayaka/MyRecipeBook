@@ -110,6 +110,32 @@ pnpm dev
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
 
+## 📦 Versioning & Releases
+
+The project uses [Semantic Versioning](https://semver.org/) and [Conventional Commits](https://www.conventionalcommits.org/).
+
+**Husky + Commitlint** enforce conventional commit messages on every commit (e.g. `feat:`, `fix:`, `chore:`). That way, when you run the release script, commits since the last tag are always in a format the script can use to decide the version bump.
+
+Version bumps are driven by commit messages since the last tag:
+
+| Commit type        | Version bump |
+|--------------------|--------------|
+| `feat:`            | **Minor** (1.0.0 → 1.1.0) |
+| `fix:`, `chore:`, etc. | **Patch** (1.0.0 → 1.0.1) |
+| `BREAKING CHANGE` or `feat!:` | **Major** (1.0.0 → 2.0.0) |
+
+**Release workflow:**
+
+1. Make changes and commit with a conventional message, e.g. `fix: resolve login redirect` or `feat: add export to PDF`.
+2. Run the release script (bumps version, commits, and creates a tag):
+   ```bash
+   pnpm run release
+   ```
+3. Push commits and tags to GitHub:
+   ```bash
+   git push && git push origin --tags
+   ```
+
 ## 🐳 Docker Deployment
 
 ### Quick Start with Docker Compose
