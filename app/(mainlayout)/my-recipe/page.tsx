@@ -13,6 +13,9 @@ import {
   AlertCircle,
   AlertTriangle,
   BookOpen,
+  Clock,
+  CheckCircle,
+  XCircle,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -48,6 +51,7 @@ interface Recipe {
   makeTime?: number | null;
   category: Category;
   imageUrl?: string | null;
+  status?: "PENDING" | "APPROVED" | "REJECTED";
   createdAt: string;
   updatedAt: string;
 }
@@ -113,7 +117,7 @@ const MyRecipesPage: React.FC = () => {
         return;
       }
 
-      const url = `/api/recipes?authorId=${userId}`;
+      const url = `/api/recipes?authorId=${userId}&limit=100`;
       console.log("Fetching from:", url);
 
       const response = await fetch(url);
@@ -225,6 +229,28 @@ const MyRecipesPage: React.FC = () => {
       [Category.SNACK]: "bg-purple-100 text-purple-800",
     };
     return colors[category];
+  };
+
+  const getStatusIcon = (recipeStatus: string) => {
+    switch (recipeStatus) {
+      case "APPROVED":
+        return <CheckCircle className="h-4 w-4 text-emerald-600" />;
+      case "REJECTED":
+        return <XCircle className="h-4 w-4 text-red-600" />;
+      default:
+        return <Clock className="h-4 w-4 text-yellow-600" />;
+    }
+  };
+
+  const getStatusBadgeVariant = (recipeStatus: string) => {
+    switch (recipeStatus) {
+      case "APPROVED":
+        return "default";
+      case "REJECTED":
+        return "destructive";
+      default:
+        return "secondary";
+    }
   };
 
   const formatDate = (dateString: string): string => {
@@ -414,6 +440,9 @@ const MyRecipesPage: React.FC = () => {
                           Time
                         </th>
                         <th className="px-6 py-4 text-left text-sm font-semibold text-slate-700">
+                          Status
+                        </th>
+                        <th className="px-6 py-4 text-left text-sm font-semibold text-slate-700">
                           Created
                         </th>
                         <th className="px-6 py-4 text-right text-sm font-semibold text-slate-700">
@@ -455,6 +484,14 @@ const MyRecipesPage: React.FC = () => {
                           </td>
                           <td className="px-6 py-4 text-slate-700">
                             {recipe.makeTime ? `${recipe.makeTime} min` : "-"}
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className="flex items-center gap-1.5">
+                              {getStatusIcon(recipe.status ?? "PENDING")}
+                              <Badge variant={getStatusBadgeVariant(recipe.status ?? "PENDING")}>
+                                {recipe.status ?? "PENDING"}
+                              </Badge>
+                            </span>
                           </td>
                           <td className="px-6 py-4 text-slate-700">
                             {formatDate(recipe.createdAt)}
@@ -517,9 +554,17 @@ const MyRecipesPage: React.FC = () => {
                         <p className="mb-2 line-clamp-2 text-sm text-slate-500">
                           {recipe.description}
                         </p>
-                        <Badge className={getCategoryColor(recipe.category)}>
-                          {recipe.category}
-                        </Badge>
+                        <div className="flex flex-wrap gap-2">
+                          <Badge className={getCategoryColor(recipe.category)}>
+                            {recipe.category}
+                          </Badge>
+                          <span className="flex items-center gap-1.5">
+                            {getStatusIcon(recipe.status ?? "PENDING")}
+                            <Badge variant={getStatusBadgeVariant(recipe.status ?? "PENDING")}>
+                              {recipe.status ?? "PENDING"}
+                            </Badge>
+                          </span>
+                        </div>
                       </div>
                     </div>
                     <div className="flex items-center justify-between border-t border-slate-200 pt-3">
@@ -563,9 +608,9 @@ const MyRecipesPage: React.FC = () => {
                 <button
                   onClick={() => goToPage(currentPage - 1)}
                   disabled={currentPage === 1}
-                  className="rounded-lg border-2 border-slate-200 bg-white p-2 transition-colors hover:border-slate-300 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="rounded-lg border-2 border-border bg-background p-2 transition-colors hover:border-input hover:bg-accent disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  <ChevronLeft className="h-5 w-5 text-slate-600" />
+                  <ChevronLeft className="h-5 w-5 text-muted-foreground" />
                 </button>
 
                 {getPageNumbers().map((page, index) =>
@@ -575,14 +620,14 @@ const MyRecipesPage: React.FC = () => {
                       onClick={() => goToPage(page)}
                       className={`h-10 w-10 min-w-[40px] rounded-lg border-2 font-semibold transition-colors ${
                         currentPage === page
-                          ? "border-slate-900 bg-slate-900 text-white"
-                          : "border-slate-200 bg-white text-slate-700 hover:border-slate-300"
+                          ? "border-primary bg-primary text-primary-foreground"
+                          : "border-border bg-background text-foreground hover:border-input hover:bg-accent"
                       }`}
                     >
                       {page}
                     </button>
                   ) : (
-                    <span key={index} className="px-2 text-slate-400">
+                    <span key={index} className="px-2 text-muted-foreground">
                       {page}
                     </span>
                   ),
@@ -591,9 +636,9 @@ const MyRecipesPage: React.FC = () => {
                 <button
                   onClick={() => goToPage(currentPage + 1)}
                   disabled={currentPage === totalPages}
-                  className="rounded-lg border-2 border-slate-200 bg-white p-2 transition-colors hover:border-slate-300 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="rounded-lg border-2 border-border bg-background p-2 transition-colors hover:border-input hover:bg-accent disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  <ChevronRight className="h-5 w-5 text-slate-600" />
+                  <ChevronRight className="h-5 w-5 text-muted-foreground" />
                 </button>
               </div>
             )}

@@ -21,10 +21,13 @@ export async function GET(request: NextRequest) {
     const skip = (page - 1) * limit;
 
     // Build where clause based on query parameters
-    const where: any = {};
+    const where: Record<string, unknown> = {};
 
-    // Super admins see all recipes, users only see approved
-    if (session?.user?.role !== "SUPER_ADMIN") {
+    // Author viewing their own recipes: show all statuses (PENDING, APPROVED, REJECTED)
+    const isAuthorViewingOwn = authorId && session?.user?.id && authorId === session.user.id;
+    if (isAuthorViewingOwn) {
+      // Don't filter by status - author sees all their recipes
+    } else if (session?.user?.role !== "SUPER_ADMIN") {
       where.status = "APPROVED";
     } else if (status) {
       where.status = status;

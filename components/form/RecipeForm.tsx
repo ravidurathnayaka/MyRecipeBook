@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Plus,
   Upload,
@@ -8,9 +8,14 @@ import {
   ArrowLeft,
   Trash2,
   Loader2,
+  ImagePlus,
+  X,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { useUploadThing } from "@/lib/uploadthing";
+import { toast } from "sonner";
 
 export enum Category {
   BREAKFAST = "BREAKFAST",
@@ -83,6 +88,52 @@ export function RecipeForm({
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [imagePreview, setImagePreview] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isRemovingImage, setIsRemovingImage] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const isUploadThingUrl = (url: string) => {
+    try {
+      const host = new URL(url).hostname;
+      return host === "utfs.io" || host.endsWith(".ufs.sh");
+    } catch {
+      return false;
+    }
+  };
+
+  const handleRemoveImage = async () => {
+    const url = formData.imageUrl;
+    setFormData((prev) => ({ ...prev, imageUrl: "" }));
+    setImagePreview("");
+    if (!url || !isUploadThingUrl(url)) return;
+    setIsRemovingImage(true);
+    try {
+      const res = await fetch("/api/uploadthing/delete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Failed to delete image");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to remove image from storage");
+    } finally {
+      setIsRemovingImage(false);
+    }
+  };
+
+  const { startUpload, isUploading } = useUploadThing("recipeImage", {
+    onClientUploadComplete: (res) => {
+      const url = res?.[0]?.url;
+      if (url) {
+        setFormData((prev) => ({ ...prev, imageUrl: url }));
+        setImagePreview(url);
+        toast.success("Image uploaded successfully");
+      }
+    },
+    onUploadError: (error) => {
+      toast.error(error.message || "Failed to upload image");
+    },
+  });
 
   useEffect(() => {
     if (initialData) {
@@ -311,21 +362,63 @@ export function RecipeForm({
                 <label className="mb-2 block text-sm font-semibold text-foreground">
                   Image URL
                 </label>
-                <div className="flex gap-2">
-                  <div className="relative flex-1">
-                    <Upload className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+                <div className="flex items-stretch gap-2">
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        startUpload([file]);
+                        e.target.value = "";
+                      }
+                    }}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    disabled={isSubmitting || isUploading}
+                    onClick={() => fileInputRef.current?.click()}
+                    className="h-12 shrink-0 !px-4 rounded-lg border-2 border-input min-w-[100px]"
+                  >
+                    {isUploading ? (
+                      <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                    ) : (
+                      <>
+                        <ImagePlus className="h-4 w-4 shrink-0" />
+                        Upload
+                      </>
+                    )}
+                  </Button>
+                  <div className="relative flex-1 min-w-0">
+                    <Upload className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 text-muted-foreground shrink-0" />
                     <input
                       type="url"
                       value={formData.imageUrl}
                       onChange={(e) => handleImageUrlChange(e.target.value)}
                       placeholder="https://example.com/image.jpg"
                       disabled={isSubmitting}
-                      className="w-full rounded-lg border-2 border-input py-3 pr-4 pl-11 text-foreground placeholder:text-muted-foreground bg-background focus:ring-2 focus:ring-primary focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                      className="h-12 w-full rounded-lg border-2 border-input py-3 pr-4 pl-11 text-foreground placeholder:text-muted-foreground bg-background focus:ring-2 focus:ring-primary focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                     />
                   </div>
                 </div>
                 {imagePreview && (
-                  <div className="mt-4">
+                  <div className="relative mt-4 inline-block w-full">
+                    <button
+                      type="button"
+                      onClick={handleRemoveImage}
+                      disabled={isSubmitting || isRemovingImage}
+                      className="absolute right-2 top-2 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-destructive/90 text-white shadow-md transition-colors hover:bg-destructive disabled:cursor-not-allowed disabled:opacity-50"
+                      aria-label="Remove image"
+                    >
+                      {isRemovingImage ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <X className="h-4 w-4" />
+                      )}
+                    </button>
                     <img
                       src={imagePreview}
                       alt="Preview"
