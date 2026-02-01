@@ -70,10 +70,13 @@ export default function AdminRecipesPage() {
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [page, setPage] = useState(1);
   const [pagination, setPagination] = useState<Pagination | null>(null);
-  const [updating, setUpdating] = useState<string | null>(null);
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [updatingAction, setUpdatingAction] = useState<"approve" | "reject" | "pending" | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [recipeToDelete, setRecipeToDelete] = useState<Recipe | null>(null);
+  const [approveAllLoading, setApproveAllLoading] = useState(false);
+  const [approveAllDialogOpen, setApproveAllDialogOpen] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -140,10 +143,12 @@ export default function AdminRecipesPage() {
 
   const updateRecipeStatus = async (
     recipeId: string,
-    status: "APPROVED" | "REJECTED" | "PENDING"
+    status: "APPROVED" | "REJECTED" | "PENDING",
+    action: "approve" | "reject" | "pending"
   ) => {
     try {
-      setUpdating(recipeId);
+      setUpdatingId(recipeId);
+      setUpdatingAction(action);
       const response = await fetch("/api/admin/recipes", {
         method: "PATCH",
         headers: {
@@ -164,7 +169,36 @@ export default function AdminRecipesPage() {
       console.error("Error updating recipe:", error);
       toast.error("Failed to update recipe status");
     } finally {
-      setUpdating(null);
+      setUpdatingId(null);
+      setUpdatingAction(null);
+    }
+  };
+
+  const approveAllPending = async () => {
+    try {
+      setApproveAllLoading(true);
+      setApproveAllDialogOpen(false);
+      const response = await fetch("/api/admin/recipes", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ bulkApprove: true }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        toast.error(error.message || "Failed to approve recipes");
+        return;
+      }
+
+      const data = await response.json();
+      toast.success(data.message || "All pending recipes approved");
+      adminRecipesCache = null;
+      fetchRecipes();
+    } catch (error) {
+      console.error("Error approving all:", error);
+      toast.error("Failed to approve recipes");
+    } finally {
+      setApproveAllLoading(false);
     }
   };
 
@@ -253,60 +287,113 @@ export default function AdminRecipesPage() {
           <CardTitle>Filters</CardTitle>
         </CardHeader>
         <CardContent className="px-0 pt-0">
-          <div className="flex gap-4 flex-col sm:flex-row">
-            <div className="flex-1">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search recipes..."
-                  value={search}
-                  onChange={(e) => {
-                    setSearch(e.target.value);
-                    setPage(1);
-                  }}
-                  className="h-10 w-full pl-10"
-                />
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex gap-4 flex-col sm:flex-row flex-1">
+              <div className="flex-1 min-w-0">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search recipes..."
+                    value={search}
+                    onChange={(e) => {
+                      setSearch(e.target.value);
+                      setPage(1);
+                    }}
+                    className="h-10 w-full pl-10"
+                  />
+                </div>
               </div>
+              <Select
+                value={statusFilter}
+                onValueChange={(value) => {
+                  setStatusFilter(value);
+                  setPage(1);
+                }}
+              >
+                <SelectTrigger className="w-full sm:w-[180px]">
+                  <SelectValue placeholder="Filter by status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Statuses</SelectItem>
+                  <SelectItem value="PENDING">Pending</SelectItem>
+                  <SelectItem value="APPROVED">Approved</SelectItem>
+                  <SelectItem value="REJECTED">Rejected</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select
+                value={categoryFilter}
+                onValueChange={(value) => {
+                  setCategoryFilter(value);
+                  setPage(1);
+                }}
+              >
+                <SelectTrigger className="w-full sm:w-[180px]">
+                  <SelectValue placeholder="Filter by category" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Categories</SelectItem>
+                  <SelectItem value="BREAKFAST">Breakfast</SelectItem>
+                  <SelectItem value="LUNCH">Lunch</SelectItem>
+                  <SelectItem value="DINNER">Dinner</SelectItem>
+                  <SelectItem value="DESSERT">Dessert</SelectItem>
+                  <SelectItem value="SNACK">Snack</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-            <Select
-              value={statusFilter}
-              onValueChange={(value) => {
-                setStatusFilter(value);
-                setPage(1);
-              }}
+            <Button
+              variant="default"
+              size="sm"
+              onClick={() => setApproveAllDialogOpen(true)}
+              disabled={approveAllLoading}
+              className="bg-emerald-600 hover:bg-emerald-700 shrink-0"
             >
-              <SelectTrigger className="w-full sm:w-[180px]">
-                <SelectValue placeholder="Filter by status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Statuses</SelectItem>
-                <SelectItem value="PENDING">Pending</SelectItem>
-                <SelectItem value="APPROVED">Approved</SelectItem>
-                <SelectItem value="REJECTED">Rejected</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select
-              value={categoryFilter}
-              onValueChange={(value) => {
-                setCategoryFilter(value);
-                setPage(1);
-              }}
-            >
-              <SelectTrigger className="w-full sm:w-[180px]">
-                <SelectValue placeholder="Filter by category" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Categories</SelectItem>
-                <SelectItem value="BREAKFAST">Breakfast</SelectItem>
-                <SelectItem value="LUNCH">Lunch</SelectItem>
-                <SelectItem value="DINNER">Dinner</SelectItem>
-                <SelectItem value="DESSERT">Dessert</SelectItem>
-                <SelectItem value="SNACK">Snack</SelectItem>
-              </SelectContent>
-            </Select>
+              {approveAllLoading ? (
+                <Loader2 className="h-4 w-4 animate-spin text-primary" />
+              ) : (
+                <>
+                  <CheckCircle className="h-4 w-4 mr-2" />
+                  Approve All Pending
+                </>
+              )}
+            </Button>
           </div>
         </CardContent>
       </Card>
+
+      <AlertDialog open={approveAllDialogOpen} onOpenChange={setApproveAllDialogOpen}>
+        <AlertDialogContent className="sm:max-w-md">
+          <AlertDialogHeader>
+            <div className="flex items-center gap-3">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-900/30">
+                <CheckCircle className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
+              </div>
+              <div className="flex-1">
+                <AlertDialogTitle>Approve All Pending Recipes</AlertDialogTitle>
+                <AlertDialogDescription className="mt-1.5">
+                  Are you sure you want to approve all recipes with PENDING status? This will approve every pending recipe in the system.
+                </AlertDialogDescription>
+              </div>
+            </div>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="mt-6 flex-row gap-2 sm:gap-2">
+            <AlertDialogCancel className="mt-0">Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => {
+                e.preventDefault();
+                approveAllPending();
+              }}
+              className="bg-emerald-600 hover:bg-emerald-700"
+              disabled={approveAllLoading}
+            >
+              {approveAllLoading ? (
+                <Loader2 className="h-4 w-4 animate-spin text-primary" />
+              ) : (
+                "Approve All"
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {loading ? (
         <div className="flex items-center justify-center py-12">
@@ -381,11 +468,11 @@ export default function AdminRecipesPage() {
                           <Button
                             variant="default"
                             size="sm"
-                            onClick={() => updateRecipeStatus(recipe.id, "APPROVED")}
-                            disabled={updating === recipe.id}
+                            onClick={() => updateRecipeStatus(recipe.id, "APPROVED", "approve")}
+                            disabled={updatingId !== null || deletingId !== null}
                             className="bg-emerald-600 hover:bg-emerald-700"
                           >
-                            {updating === recipe.id ? (
+                            {updatingId === recipe.id && updatingAction === "approve" ? (
                               <Loader2 className="h-4 w-4 animate-spin text-primary" />
                             ) : (
                               <>
@@ -399,10 +486,10 @@ export default function AdminRecipesPage() {
                           <Button
                             variant="destructive"
                             size="sm"
-                            onClick={() => updateRecipeStatus(recipe.id, "REJECTED")}
-                            disabled={updating === recipe.id}
+                            onClick={() => updateRecipeStatus(recipe.id, "REJECTED", "reject")}
+                            disabled={updatingId !== null || deletingId !== null}
                           >
-                            {updating === recipe.id ? (
+                            {updatingId === recipe.id && updatingAction === "reject" ? (
                               <Loader2 className="h-4 w-4 animate-spin text-primary" />
                             ) : (
                               <>
@@ -416,10 +503,10 @@ export default function AdminRecipesPage() {
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => updateRecipeStatus(recipe.id, "PENDING")}
-                            disabled={updating === recipe.id}
+                            onClick={() => updateRecipeStatus(recipe.id, "PENDING", "pending")}
+                            disabled={updatingId !== null || deletingId !== null}
                           >
-                            {updating === recipe.id ? (
+                            {updatingId === recipe.id && updatingAction === "pending" ? (
                               <Loader2 className="h-4 w-4 animate-spin text-primary" />
                             ) : (
                               <>
@@ -433,7 +520,7 @@ export default function AdminRecipesPage() {
                           variant="outline"
                           size="sm"
                           onClick={() => openDeleteDialog(recipe)}
-                          disabled={updating === recipe.id || deletingId !== null}
+                          disabled={updatingId !== null || deletingId !== null}
                           className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/30"
                         >
                           {deletingId === recipe.id ? (

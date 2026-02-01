@@ -75,13 +75,25 @@ export async function GET(request: Request) {
   }
 }
 
-// UPDATE recipe status (approve/reject)
+// UPDATE recipe status (approve/reject) or bulk approve all pending
 export async function PATCH(request: Request) {
   try {
     await requireAdmin();
 
     const body = await request.json();
-    const { recipeId, status } = body;
+    const { recipeId, status, bulkApprove } = body;
+
+    // Bulk approve all pending recipes
+    if (bulkApprove === true) {
+      const result = await prisma.recipe.updateMany({
+        where: { status: "PENDING" },
+        data: { status: "APPROVED" },
+      });
+      return NextResponse.json(
+        { message: `${result.count} recipe(s) approved`, count: result.count },
+        { status: 200 }
+      );
+    }
 
     if (!recipeId || !status) {
       return NextResponse.json(
