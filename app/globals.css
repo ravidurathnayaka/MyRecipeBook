@@ -283,6 +283,22 @@
     color: #374151 !important;
   }
 
+  /* MyRecipeBook logo in print – text dark, icon orange (no theme vars) */
+  .site-logo-text {
+    color: #111827 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .site-logo-icon {
+    background: #fed7aa !important;
+    color: #ea580c !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .site-logo-icon svg {
+    color: #ea580c !important;
+  }
+
   /* Badge in hero - ensure readable */
   .recipe-title-overlay span:first-child {
     background: #e5e7eb !important;

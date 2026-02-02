@@ -95,15 +95,15 @@ const NavBarClient = ({ session }: { session: any }) => {
         <div className="mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
             <div className="flex items-center gap-6 lg:gap-8">
-              {/* Logo */}
+              {/* Logo - explicit colors so Safari/iOS and print show correct logo (text dark, icon orange) */}
               <Link
                 href="/"
-                className="flex shrink-0 items-center gap-2 rounded-lg py-2 transition-opacity hover:opacity-90"
+                className="site-logo flex shrink-0 items-center gap-2 rounded-lg py-2 transition-opacity hover:opacity-90"
               >
-                <div className="bg-primary/10 text-primary flex h-9 w-9 items-center justify-center rounded-xl sm:h-10 sm:w-10">
+                <div className="site-logo-icon flex h-9 w-9 items-center justify-center rounded-xl bg-orange-100 text-orange-600 sm:h-10 sm:w-10 dark:bg-orange-900/40 dark:text-orange-400">
                   <ChefHat className="h-5 w-5 sm:h-6 sm:w-6" />
                 </div>
-                <span className="text-foreground text-lg font-bold tracking-tight sm:text-xl">
+                <span className="site-logo-text text-lg font-bold tracking-tight text-neutral-900 sm:text-xl dark:text-neutral-100">
                   MyRecipeBook
                 </span>
               </Link>
