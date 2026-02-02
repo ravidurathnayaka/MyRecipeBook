@@ -127,17 +127,46 @@
   }
 }
 
-/* Print styles for recipe PDF */
+/* Print styles for recipe PDF - force light colors (fixes dark mode) */
 @media print {
   .no-print {
     display: none !important;
   }
 
+  /* Force light-mode theme when printing so dark mode doesn't produce dark PDFs */
+  :root,
+  .dark {
+    --background: #ffffff;
+    --foreground: #111827;
+    --card: #ffffff;
+    --card-foreground: #111827;
+    --muted: #f3f4f6;
+    --muted-foreground: #6b7280;
+    --primary: #b45309;
+    --primary-foreground: #ffffff;
+    --border: #e5e7eb;
+    --accent: #f3f4f6;
+    --accent-foreground: #111827;
+  }
+
   body {
     background: white !important;
-    color: black !important;
+    color: #111827 !important;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
+  }
+
+  /* Force all text dark for print (overrides dark mode text colors) */
+  body * {
+    color: inherit !important;
+  }
+  body {
+    color: #111827 !important;
+  }
+
+  /* Restore muted text for labels */
+  [class*="text-muted"] {
+    color: #6b7280 !important;
   }
 
   /* Remove sticky positioning for print */
@@ -156,10 +185,43 @@
   [class*="bg-background"],
   [class*="bg-card"],
   [class*="bg-muted"],
-  [class*="bg-secondary"] {
+  [class*="bg-secondary"],
+  [class*="bg-primary"],
+  [class*="bg-emerald"],
+  [class*="bg-purple"],
+  [class*="bg-amber"],
+  [class*="bg-orange"],
+  [class*="bg-green"] {
     background: white !important;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
+  }
+
+  /* Light gray for icon circles / subtle areas */
+  [class*="bg-primary/10"],
+  [class*="bg-primary/20"],
+  [class*="rounded-full"][class*="p-3"] {
+    background: #f3f4f6 !important;
+  }
+
+  /* Ingredient list bullets - keep visible in print */
+  .recipe-ingredient-bullet {
+    background: #111827 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    color-adjust: exact;
+  }
+
+  /* Fallback: native list bullets if custom bullets don't print */
+  .recipe-ingredients-list {
+    list-style-type: disc !important;
+    padding-left: 1.5rem !important;
+  }
+  .recipe-ingredients-list .recipe-ingredient-bullet {
+    display: none !important;
+  }
+  .recipe-ingredients-list li {
+    display: list-item !important;
   }
 
   /* Keep borders visible */

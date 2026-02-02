@@ -88,14 +88,24 @@ const NavBarClient = ({ session }: { session: any }) => {
 
   return (
     <>
-      <nav className="bg-background/95 supports-backdrop-filter:bg-background/60 sticky top-0 z-50 border-b backdrop-blur">
+      <nav
+        className="bg-background/70 supports-[backdrop-filter]:bg-background/60 fixed top-0 right-0 left-0 z-50 shadow-lg backdrop-blur-xl"
+        aria-label="Main navigation"
+      >
         <div className="mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
-            <div className="flex gap-5">
+            <div className="flex items-center gap-6 lg:gap-8">
               {/* Logo */}
-              <Link href="/" className="flex shrink-0 items-center gap-2">
-                <ChefHat className="text-primary h-8 w-8 sm:h-10 sm:w-10" />
-                <h1 className="text-xl font-bold sm:text-2xl">MyRecipeBook</h1>
+              <Link
+                href="/"
+                className="flex shrink-0 items-center gap-2 rounded-lg py-2 transition-opacity hover:opacity-90"
+              >
+                <div className="bg-primary/10 text-primary flex h-9 w-9 items-center justify-center rounded-xl sm:h-10 sm:w-10">
+                  <ChefHat className="h-5 w-5 sm:h-6 sm:w-6" />
+                </div>
+                <span className="text-foreground text-lg font-bold tracking-tight sm:text-xl">
+                  MyRecipeBook
+                </span>
               </Link>
 
               {/* Desktop Navigation */}
@@ -129,15 +139,16 @@ const NavBarClient = ({ session }: { session: any }) => {
             </div>
 
             {/* Desktop Actions */}
-            <div className="hidden items-center gap-5 md:flex">
+            <div className="hidden items-center gap-3 md:flex">
               <ThemeToggle />
               {session?.user ? (
-                <div className="flex place-content-center gap-5">
+                <div className="flex items-center gap-3">
                   <Link
                     href="/create-recipe"
-                    className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex h-10 w-10 items-center justify-center gap-2 rounded-md font-semibold transition-colors"
+                    className="bg-primary text-primary-foreground hover:bg-primary/90 flex h-9 w-9 items-center justify-center rounded-lg shadow-sm transition-all hover:shadow-md"
+                    aria-label="Create recipe"
                   >
-                    <Plus className="flex h-5 w-5" />
+                    <Plus className="h-4 w-4" />
                   </Link>
                   <UserDropdown
                     email={session.user.email as string}
@@ -149,7 +160,7 @@ const NavBarClient = ({ session }: { session: any }) => {
               ) : (
                 <Link
                   href="/login"
-                  className="hover border-border hover:bg-primary hover:text-primary-foreground inline-flex items-center gap-2 rounded-lg border-2 px-6 py-3 font-semibold transition-colors"
+                  className="bg-muted/80 text-foreground hover:bg-primary hover:text-primary-foreground rounded-lg px-4 py-2.5 text-sm font-semibold shadow-sm transition-all hover:shadow-md"
                 >
                   <span className="hidden lg:inline">Login</span>
                 </Link>
@@ -160,41 +171,43 @@ const NavBarClient = ({ session }: { session: any }) => {
             <div className="flex items-center gap-2 md:hidden">
               <Link
                 href="/create-recipe"
-                className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center justify-center rounded-lg p-2 shadow-md transition-all"
+                className="bg-primary text-primary-foreground flex h-9 w-9 items-center justify-center rounded-lg shadow-sm"
+                aria-label="Create recipe"
               >
-                <Plus className="h-5 w-5" />
+                <Plus className="h-4 w-4" />
               </Link>
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="hover:bg-accent rounded-lg p-2 transition-colors"
+                className="bg-background/60 hover:bg-muted/80 flex h-9 w-9 items-center justify-center rounded-lg shadow-sm backdrop-blur-sm transition-colors hover:shadow-md"
                 aria-label="Toggle menu"
                 aria-expanded={mobileMenuOpen}
               >
                 {mobileMenuOpen ? (
-                  <X className="h-6 w-6" />
+                  <X className="h-5 w-5" />
                 ) : (
-                  <Menu className="h-6 w-6" />
+                  <Menu className="h-5 w-5" />
                 )}
               </button>
             </div>
           </div>
         </div>
 
-        {/* Mobile Menu Overlay */}
+        {/* Mobile Menu Overlay - blurred */}
         {mobileMenuOpen && (
           <div
-            className="fixed inset-0 top-16 z-40 bg-black/20 backdrop-blur-sm md:hidden"
+            className="fixed inset-0 top-16 z-40 bg-black/30 backdrop-blur-md md:hidden"
             onClick={() => setMobileMenuOpen(false)}
+            aria-hidden="true"
           />
         )}
 
-        {/* Mobile Menu */}
+        {/* Mobile Menu - glass style */}
         <div
           className={clsx(
-            "bg-background fixed top-16 right-0 left-0 z-50 border-b shadow-lg transition-all duration-300 ease-in-out md:hidden",
+            "bg-background/80 fixed top-16 right-0 left-0 z-50 mx-4 mt-2 overflow-hidden rounded-2xl shadow-2xl backdrop-blur-xl transition-all duration-300 ease-out md:hidden",
             mobileMenuOpen
               ? "translate-y-0 opacity-100"
-              : "pointer-events-none -translate-y-full opacity-0",
+              : "pointer-events-none -translate-y-4 opacity-0",
           )}
         >
           <div className="space-y-4 px-4 py-6">
@@ -221,16 +234,16 @@ const NavBarClient = ({ session }: { session: any }) => {
             </div>
 
             {/* Mobile User Section */}
-            <div className="border-t pt-4">
+            <div className="border-border/50 border-t pt-4">
               <div className="mb-4 flex items-center justify-between px-4">
-                <span className="text-foreground/70 text-sm font-medium">
+                <span className="text-muted-foreground text-sm font-medium">
                   Theme
                 </span>
                 <ThemeToggle />
               </div>
               {session?.user ? (
                 <div className="space-y-3">
-                  <div className="bg-accent/50 flex items-center gap-3 rounded-lg px-2 py-3">
+                  <div className="bg-muted/50 flex items-center gap-3 rounded-xl px-3 py-3">
                     {session.user.image ? (
                       <img
                         src={session.user.image}

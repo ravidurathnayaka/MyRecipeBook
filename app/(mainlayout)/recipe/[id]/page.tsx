@@ -305,13 +305,16 @@ export default function RecipeDetailPage() {
                   <ChefHat className="text-primary h-6 w-6 shrink-0" />
                   Ingredients
                 </h2>
-                <ul className="ml-5 space-y-3">
+                <ul className="recipe-ingredients-list ml-5 list-none space-y-3">
                   {recipe.ingredients.map((ingredient, index) => (
                     <li
                       key={index}
                       className="text-foreground flex items-start gap-3"
                     >
-                      <div className="bg-primary mt-2 h-2 w-2 flex-shrink-0 rounded-full" />
+                      <span
+                        className="recipe-ingredient-bullet bg-primary mt-2 h-2 w-2 flex-shrink-0 rounded-full"
+                        aria-hidden
+                      />
                       <span className="leading-relaxed">{ingredient}</span>
                     </li>
                   ))}

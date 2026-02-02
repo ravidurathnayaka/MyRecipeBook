@@ -5,9 +5,10 @@ import { ReactNode } from "react";
 const MainLayout = ({ children }: { children: ReactNode }) => {
   return (
     <div className="flex min-h-screen flex-col">
-      {/* Navbar always on top - hidden when printing */}
+      {/* Fixed navbar - spacer keeps content from sliding under it */}
       <div className="no-print">
         <Navbar />
+        <div className="h-16" aria-hidden="true" />
       </div>
 
       {/* Main content grows to fill available space */}

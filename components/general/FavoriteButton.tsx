@@ -87,20 +87,25 @@ export function FavoriteButton({
     }
   };
 
+  const sizeClasses: Record<string, string> = {
+    sm: "h-8 w-8 !px-0 !py-0",
+    default: "h-10 w-10 !px-0 !py-0",
+    lg: "h-12 w-12 !px-0 !py-0",
+    icon: "h-10 w-10 !px-0 !py-0",
+  };
+
   if (checking) {
     return (
-      <Button variant={variant} size={size} disabled>
-        <Loader2 className="h-4 w-4 animate-spin text-primary" />
+      <Button
+        variant={variant}
+        size={size}
+        disabled
+        className={sizeClasses[size]}
+      >
+        <Loader2 className="text-primary h-4 w-4 animate-spin" />
       </Button>
     );
   }
-
-  const sizeClasses: Record<string, string> = {
-    sm: "h-8 w-8 p-0",
-    default: "h-10 w-10 p-0",
-    lg: "h-12 w-12 p-0",
-    icon: "h-10 w-10 p-0",
-  };
 
   return (
     <Button
@@ -111,7 +116,7 @@ export function FavoriteButton({
       className={sizeClasses[size]}
     >
       {loading ? (
-        <Loader2 className="h-4 w-4 animate-spin text-primary" />
+        <Loader2 className="text-primary h-4 w-4 animate-spin" />
       ) : (
         <Heart
           className={`h-4 w-4 ${
