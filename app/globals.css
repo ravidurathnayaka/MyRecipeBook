@@ -49,6 +49,15 @@
 :root {
   --footer-bg: #f97316;
   --radius: 0.65rem;
+  /* Hex fallbacks for older Safari (e.g. iPhone 7 Plus on iOS < 15.4) that don't support oklch */
+  --background: #ffffff;
+  --foreground: #1c1917;
+  --card: #ffffff;
+  --card-foreground: #1c1917;
+  --popover: #ffffff;
+  --popover-foreground: #1c1917;
+  --primary: #d97706;
+  --primary-foreground: #ffffff;
   --background: oklch(1 0 0);
   --foreground: oklch(0.141 0.005 285.823);
   --card: oklch(1 0 0);
@@ -85,6 +94,15 @@
 .dark {
   --footer-bg: #ea580c;
   --color-footer: var(--color-footer-dark);
+  /* Hex fallbacks for older Safari */
+  --background: #0c0a09;
+  --foreground: #fafafa;
+  --card: #1c1917;
+  --card-foreground: #fafafa;
+  --popover: #1c1917;
+  --popover-foreground: #fafafa;
+  --primary: #ea580c;
+  --primary-foreground: #ffffff;
   --background: oklch(0.141 0.005 285.823);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.21 0.006 285.885);

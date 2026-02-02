@@ -213,13 +213,13 @@ export function ShoppingListButton({
   if (!open) {
     return (
       <Button
-        variant="default"
+        variant="ghost"
         size={fab ? "icon" : "sm"}
         onClick={() => setOpen(true)}
         className={
           fab
-            ? "h-14 w-14 shrink-0 rounded-full bg-gradient-to-r from-emerald-600 to-emerald-700 text-white shadow-lg transition-all hover:scale-105 hover:from-emerald-700 hover:to-emerald-800 hover:shadow-xl"
-            : "shrink-0 bg-gradient-to-r from-emerald-600 to-emerald-700 !px-4 whitespace-nowrap text-white shadow-md transition-all hover:from-emerald-700 hover:to-emerald-800 hover:shadow-lg"
+            ? "h-14 w-14 shrink-0 rounded-full !bg-[linear-gradient(to_right,#059669,#047857)] text-white shadow-lg transition-all hover:scale-105 hover:!bg-[linear-gradient(to_right,#047857,#065f46)] focus-visible:ring-emerald-500/50"
+            : "shrink-0 !bg-[linear-gradient(to_right,#059669,#047857)] !px-4 whitespace-nowrap text-white shadow-md transition-all hover:!bg-[linear-gradient(to_right,#047857,#065f46)] focus-visible:ring-emerald-500/50"
         }
         aria-label="Open shopping list"
       >
@@ -277,7 +277,7 @@ export function ShoppingListButton({
             </Button>
           </div>
 
-          {/* Progress + Print */}
+          {/* Progress + Select All + Print */}
           <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-2">
               <div className="bg-muted h-2 w-24 overflow-hidden rounded-full">
@@ -292,44 +292,42 @@ export function ShoppingListButton({
                 {checkedCount}/{totalCount} done
               </span>
             </div>
-            <Button
-              variant="default"
-              size="sm"
-              onClick={printList}
-              className="h-9 gap-2 rounded-lg px-4 text-sm font-medium shadow-sm"
-            >
-              <Download className="h-4 w-4 shrink-0" />
-              Print List
-            </Button>
-          </div>
-
-          {/* Select All / Clear toggle */}
-          {ingredients.length > 0 && (
-            <div className="mt-3">
+            <div className="flex items-center gap-2">
+              {ingredients.length > 0 && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={toggleSelectAll}
+                  className={
+                    allSelected
+                      ? "border-border bg-muted/50 text-muted-foreground hover:border-destructive/30 hover:bg-destructive/10 hover:text-destructive h-9 min-h-9 gap-2 rounded-lg border px-4 text-sm font-medium shadow-sm transition-all duration-200"
+                      : "border-primary/20 bg-primary/10 text-primary hover:bg-primary/15 hover:text-primary h-9 min-h-9 gap-2 rounded-lg border px-4 text-sm font-medium shadow-sm transition-all duration-200"
+                  }
+                >
+                  {allSelected ? (
+                    <>
+                      <Trash2 className="h-4 w-4 shrink-0" />
+                      Clear
+                    </>
+                  ) : (
+                    <>
+                      <Check className="h-4 w-4 shrink-0" />
+                      Select All
+                    </>
+                  )}
+                </Button>
+              )}
               <Button
-                variant="ghost"
+                variant="default"
                 size="sm"
-                onClick={toggleSelectAll}
-                className={
-                  allSelected
-                    ? "border-border bg-muted/50 text-muted-foreground hover:border-destructive/30 hover:bg-destructive/10 hover:text-destructive h-8 gap-2 rounded-xl border px-3.5 text-xs font-medium shadow-sm transition-all duration-200"
-                    : "border-primary/20 bg-primary/10 text-primary hover:bg-primary/15 hover:text-primary h-8 gap-2 rounded-xl border px-3.5 text-xs font-medium shadow-sm transition-all duration-200"
-                }
+                onClick={printList}
+                className="h-9 min-h-9 gap-2 rounded-lg px-4 text-sm font-medium shadow-sm"
               >
-                {allSelected ? (
-                  <>
-                    <Trash2 className="h-3.5 w-3.5 shrink-0" />
-                    Clear
-                  </>
-                ) : (
-                  <>
-                    <Check className="h-3.5 w-3.5 shrink-0" />
-                    Select All
-                  </>
-                )}
+                <Download className="h-4 w-4 shrink-0" />
+                Print List
               </Button>
             </div>
-          )}
+          </div>
         </div>
 
         {/* Items */}
