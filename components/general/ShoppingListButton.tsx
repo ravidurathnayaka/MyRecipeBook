@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { ShoppingCart, Download, X, Check } from "lucide-react";
+import { ShoppingCart, Download, X, Check, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface ShoppingListButtonProps {
@@ -44,6 +44,24 @@ export function ShoppingListButton({
       newMap.set(index, !prev.get(index));
       return newMap;
     });
+  };
+
+  const allSelected = totalCount > 0 && checkedCount === totalCount;
+
+  const toggleSelectAll = () => {
+    if (allSelected) {
+      setListItems((prev) => {
+        const newMap = new Map(prev);
+        ingredients.forEach((_, index) => newMap.set(index, false));
+        return newMap;
+      });
+    } else {
+      setListItems((prev) => {
+        const newMap = new Map(prev);
+        ingredients.forEach((_, index) => newMap.set(index, true));
+        return newMap;
+      });
+    }
   };
 
   const printList = () => {
@@ -164,13 +182,14 @@ export function ShoppingListButton({
           </div>
           <ul class="list">
             ${ingredients
-              .map((ing, idx) => {
-                const checked = listItems.get(idx) || false;
+              .map((ing, index) => ({ ing, index }))
+              .filter(({ index }) => listItems.get(index))
+              .map(({ ing }) => {
                 const safeIng = (ing || "")
                   .replace(/</g, "&lt;")
                   .replace(/&/g, "&amp;");
-                return `<li class="item${checked ? " checked" : ""}">
-                    <span class="checkbox">${checked ? "✓" : " "}</span>
+                return `<li class="item">
+                    <span class="checkbox"> </span>
                     <span class="ingredient">${safeIng}</span>
                   </li>`;
               })
@@ -283,6 +302,34 @@ export function ShoppingListButton({
               Print List
             </Button>
           </div>
+
+          {/* Select All / Clear toggle */}
+          {ingredients.length > 0 && (
+            <div className="mt-3">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={toggleSelectAll}
+                className={
+                  allSelected
+                    ? "border-border bg-muted/50 text-muted-foreground hover:border-destructive/30 hover:bg-destructive/10 hover:text-destructive h-8 gap-2 rounded-xl border px-3.5 text-xs font-medium shadow-sm transition-all duration-200"
+                    : "border-primary/20 bg-primary/10 text-primary hover:bg-primary/15 hover:text-primary h-8 gap-2 rounded-xl border px-3.5 text-xs font-medium shadow-sm transition-all duration-200"
+                }
+              >
+                {allSelected ? (
+                  <>
+                    <Trash2 className="h-3.5 w-3.5 shrink-0" />
+                    Clear
+                  </>
+                ) : (
+                  <>
+                    <Check className="h-3.5 w-3.5 shrink-0" />
+                    Select All
+                  </>
+                )}
+              </Button>
+            </div>
+          )}
         </div>
 
         {/* Items */}
