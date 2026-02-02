@@ -91,11 +91,16 @@ export default function RecipeDetailPage() {
 
   const getCategoryColor = (category: Category): string => {
     const colors: Record<Category, string> = {
-      [Category.BREAKFAST]: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300",
-      [Category.LUNCH]: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300",
-      [Category.DINNER]: "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300",
-      [Category.DESSERT]: "bg-pink-100 text-pink-800 dark:bg-pink-900/30 dark:text-pink-300",
-      [Category.SNACK]: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300",
+      [Category.BREAKFAST]:
+        "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300",
+      [Category.LUNCH]:
+        "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300",
+      [Category.DINNER]:
+        "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300",
+      [Category.DESSERT]:
+        "bg-pink-100 text-pink-800 dark:bg-pink-900/30 dark:text-pink-300",
+      [Category.SNACK]:
+        "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300",
     };
     return colors[category];
   };
@@ -126,9 +131,9 @@ export default function RecipeDetailPage() {
   // Loading State
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="bg-background flex min-h-screen items-center justify-center">
         <div className="text-center">
-          <Loader2 className="h-10 w-10 animate-spin text-primary mx-auto mb-4" />
+          <Loader2 className="text-primary mx-auto mb-4 h-10 w-10 animate-spin" />
           <p className="text-muted-foreground">Loading recipe...</p>
         </div>
       </div>
@@ -138,13 +143,13 @@ export default function RecipeDetailPage() {
   // Error State
   if (error || !recipe) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center px-4">
-        <Card className="max-w-md w-full shadow-xl border text-center">
+      <div className="bg-background flex min-h-screen items-center justify-center px-4">
+        <Card className="w-full max-w-md border text-center shadow-xl">
           <CardContent className="pt-12 pb-8">
-            <div className="w-20 h-20 bg-destructive/10 dark:bg-destructive/20 rounded-full flex items-center justify-center mx-auto mb-6">
-              <AlertCircle className="w-12 h-12 text-destructive" />
+            <div className="bg-destructive/10 dark:bg-destructive/20 mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full">
+              <AlertCircle className="text-destructive h-12 w-12" />
             </div>
-            <h2 className="text-3xl font-bold text-foreground mb-3">
+            <h2 className="text-foreground mb-3 text-3xl font-bold">
               {error === "Recipe not found"
                 ? "Recipe Not Found"
                 : "Error Loading Recipe"}
@@ -154,7 +159,7 @@ export default function RecipeDetailPage() {
             </p>
             <button
               onClick={handleBack}
-              className="px-6 py-3 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90 transition-colors"
+              className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg px-6 py-3 font-semibold transition-colors"
             >
               Back to Home
             </button>
@@ -165,7 +170,7 @@ export default function RecipeDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="bg-background min-h-screen">
       {/* Hero Section */}
       <div className="recipe-hero relative h-96 w-full">
         <img
@@ -174,20 +179,20 @@ export default function RecipeDetailPage() {
             "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=1200&q=80"
           }
           alt={recipe.title}
-          className="w-full h-full object-cover"
+          className="h-full w-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent recipe-hero-overlay" />
+        <div className="recipe-hero-overlay absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
 
         {/* Action Buttons */}
-        <div className="no-print absolute top-6 left-6 right-6 flex items-center justify-between">
+        <div className="no-print absolute top-6 right-6 left-6 flex items-center justify-between">
           <Button
             onClick={handleBack}
             variant="secondary"
             size="icon"
-            className="bg-background/90 backdrop-blur-sm hover:bg-background shadow-lg"
+            className="bg-background/90 hover:bg-background shadow-lg backdrop-blur-sm"
             aria-label="Go back"
           >
-            <ArrowLeft className="w-5 h-5" />
+            <ArrowLeft className="h-5 w-5" />
           </Button>
           <div className="flex items-center gap-2">
             <FavoriteButton recipeId={id as string} variant="outline" />
@@ -200,7 +205,7 @@ export default function RecipeDetailPage() {
               variant="outline"
               size="icon"
               onClick={() => window.print()}
-              className="h-10 w-10 bg-background/90 backdrop-blur-sm"
+              className="bg-background/90 h-10 w-10 backdrop-blur-sm"
               aria-label="Print recipe"
             >
               <Printer className="h-4 w-4" />
@@ -209,19 +214,19 @@ export default function RecipeDetailPage() {
         </div>
 
         {/* Title Overlay */}
-        <div className="recipe-title-overlay absolute bottom-0 left-0 right-0 p-8 text-white">
-          <div className="max-w-5xl mx-auto">
+        <div className="recipe-title-overlay absolute right-0 bottom-0 left-0 p-8 text-white">
+          <div className="mx-auto max-w-5xl">
             <Badge
               className={`${getCategoryColor(
-                recipe.category
-              )} border-0 shadow-md mb-4`}
+                recipe.category,
+              )} mb-4 border-0 shadow-md`}
             >
               {recipe.category}
             </Badge>
-            <h1 className="text-5xl font-bold mb-3 drop-shadow-lg">
+            <h1 className="mb-3 text-5xl font-bold drop-shadow-lg">
               {recipe.title}
             </h1>
-            <p className="text-lg text-white/90 drop-shadow-md max-w-3xl">
+            <p className="max-w-3xl text-lg text-white/90 drop-shadow-md">
               {recipe.description}
             </p>
           </div>
@@ -229,21 +234,21 @@ export default function RecipeDetailPage() {
       </div>
 
       {/* Content */}
-      <div className="max-w-5xl mx-auto px-8 py-12">
+      <div className="mx-auto max-w-5xl px-8 py-12">
         {/* Meta Information */}
-        <Card className="mb-8 shadow-lg border-0 print-break-inside-avoid">
+        <Card className="print-break-inside-avoid mb-8 border-0 shadow-lg">
           <CardContent className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
               {recipe.makeTime && (
                 <div className="flex items-center gap-3">
-                  <div className="bg-primary/10 dark:bg-primary/20 p-3 rounded-full">
-                    <Clock className="w-6 h-6 text-primary" />
+                  <div className="bg-primary/10 dark:bg-primary/20 rounded-full p-3">
+                    <Clock className="text-primary h-6 w-6" />
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground font-medium">
+                    <p className="text-muted-foreground text-sm font-medium">
                       Prep Time
                     </p>
-                    <p className="text-lg font-bold text-foreground">
+                    <p className="text-foreground text-lg font-bold">
                       {recipe.makeTime} minutes
                     </p>
                   </div>
@@ -256,18 +261,18 @@ export default function RecipeDetailPage() {
                     <img
                       src={recipe.author.image}
                       alt={recipe.author.name || "User"}
-                      className="w-12 h-12 rounded-full object-cover"
+                      className="h-12 w-12 rounded-full object-cover"
                     />
                   ) : (
-                    <div className="bg-emerald-100 dark:bg-emerald-900/30 p-3 rounded-full">
-                      <User className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
+                    <div className="rounded-full bg-emerald-100 p-3 dark:bg-emerald-900/30">
+                      <User className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
                     </div>
                   )}
                   <div>
-                    <p className="text-sm text-muted-foreground font-medium">
+                    <p className="text-muted-foreground text-sm font-medium">
                       Recipe By
                     </p>
-                    <p className="text-lg font-bold text-foreground">
+                    <p className="text-foreground text-lg font-bold">
                       {recipe.author.name || "Anonymous"}
                     </p>
                   </div>
@@ -275,14 +280,14 @@ export default function RecipeDetailPage() {
               )}
 
               <div className="flex items-center gap-3">
-                <div className="bg-purple-100 dark:bg-purple-900/30 p-3 rounded-full">
-                  <Calendar className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+                <div className="rounded-full bg-purple-100 p-3 dark:bg-purple-900/30">
+                  <Calendar className="h-6 w-6 text-purple-600 dark:text-purple-400" />
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground font-medium">
+                  <p className="text-muted-foreground text-sm font-medium">
                     Published
                   </p>
-                  <p className="text-lg font-bold text-foreground">
+                  <p className="text-foreground text-lg font-bold">
                     {formatDate(recipe.createdAt)}
                   </p>
                 </div>
@@ -291,30 +296,22 @@ export default function RecipeDetailPage() {
           </CardContent>
         </Card>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
           {/* Ingredients */}
           <div className="lg:col-span-1">
-            <Card className="shadow-lg border-0 sticky top-6 print-break-inside-avoid">
+            <Card className="print-break-inside-avoid relative sticky top-6 border-0 shadow-lg">
               <CardContent className="p-6">
-                <div className="mb-4 flex flex-wrap items-center gap-3">
-                  <div className="shrink-0 no-print">
-                    <ShoppingListButton
-                      ingredients={recipe.ingredients}
-                      recipeTitle={recipe.title}
-                    />
-                  </div>
-                  <h2 className="text-2xl font-bold text-foreground flex items-center gap-2">
-                    <ChefHat className="w-6 h-6 shrink-0 text-primary" />
-                    Ingredients
-                  </h2>
-                </div>
-                <ul className="space-y-3">
+                <h2 className="text-foreground mb-4 flex items-center gap-2 text-2xl font-bold">
+                  <ChefHat className="text-primary h-6 w-6 shrink-0" />
+                  Ingredients
+                </h2>
+                <ul className="ml-5 space-y-3">
                   {recipe.ingredients.map((ingredient, index) => (
                     <li
                       key={index}
-                      className="flex items-start gap-3 text-foreground"
+                      className="text-foreground flex items-start gap-3"
                     >
-                      <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0" />
+                      <div className="bg-primary mt-2 h-2 w-2 flex-shrink-0 rounded-full" />
                       <span className="leading-relaxed">{ingredient}</span>
                     </li>
                   ))}
@@ -324,21 +321,21 @@ export default function RecipeDetailPage() {
           </div>
 
           {/* Steps and Tips */}
-          <div className="lg:col-span-2 space-y-8">
+          <div className="space-y-8 lg:col-span-2">
             {/* Steps */}
-            <Card className="shadow-lg border-0 print-break-inside-avoid">
+            <Card className="print-break-inside-avoid border-0 shadow-lg">
               <CardContent className="p-6">
-                <h2 className="text-2xl font-bold text-foreground mb-6">
+                <h2 className="text-foreground mb-6 text-2xl font-bold">
                   Instructions
                 </h2>
                 <div className="space-y-4">
                   {recipe.steps.map((step, index) => (
                     <div
                       key={index}
-                      className={`flex gap-4 p-4 rounded-lg transition-all cursor-pointer ${
+                      className={`flex cursor-pointer gap-4 rounded-lg p-4 transition-all ${
                         checkedSteps.has(index)
-                          ? "bg-green-50 dark:bg-green-950/30 border-2 border-green-200 dark:border-green-800"
-                          : "bg-muted border-2 border-transparent hover:border-border"
+                          ? "border-2 border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950/30"
+                          : "bg-muted hover:border-border border-2 border-transparent"
                       }`}
                       onClick={() => toggleStep(index)}
                       role="button"
@@ -353,9 +350,9 @@ export default function RecipeDetailPage() {
                     >
                       <div className="flex-shrink-0">
                         {checkedSteps.has(index) ? (
-                          <CheckCircle2 className="w-6 h-6 text-green-600 dark:text-green-400" />
+                          <CheckCircle2 className="h-6 w-6 text-green-600 dark:text-green-400" />
                         ) : (
-                          <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-sm font-bold">
+                          <div className="bg-primary text-primary-foreground flex h-6 w-6 items-center justify-center rounded-full text-sm font-bold">
                             {index + 1}
                           </div>
                         )}
@@ -363,7 +360,7 @@ export default function RecipeDetailPage() {
                       <p
                         className={`leading-relaxed ${
                           checkedSteps.has(index)
-                            ? "text-green-900 dark:text-green-100 line-through"
+                            ? "text-green-900 line-through dark:text-green-100"
                             : "text-foreground"
                         }`}
                       >
@@ -377,13 +374,13 @@ export default function RecipeDetailPage() {
 
             {/* Tips */}
             {recipe.tips && (
-              <Card className="shadow-lg border-0 bg-gradient-to-br from-amber-50/50 to-orange-50/50 dark:from-amber-950/20 dark:to-orange-950/20 print-break-inside-avoid">
+              <Card className="print-break-inside-avoid border-0 bg-gradient-to-br from-amber-50/50 to-orange-50/50 shadow-lg dark:from-amber-950/20 dark:to-orange-950/20">
                 <CardContent className="p-6">
-                  <h2 className="text-2xl font-bold text-foreground mb-4 flex items-center gap-2">
-                    <Lightbulb className="w-6 h-6 text-amber-600 dark:text-amber-400" />
+                  <h2 className="text-foreground mb-4 flex items-center gap-2 text-2xl font-bold">
+                    <Lightbulb className="h-6 w-6 text-amber-600 dark:text-amber-400" />
                     Pro Tips
                   </h2>
-                  <p className="text-foreground leading-relaxed">
+                  <p className="text-foreground ml-5 leading-relaxed">
                     {recipe.tips}
                   </p>
                 </CardContent>
@@ -391,6 +388,15 @@ export default function RecipeDetailPage() {
             )}
           </div>
         </div>
+      </div>
+
+      {/* Floating Shopping List button */}
+      <div className="no-print fixed right-6 bottom-6 z-30">
+        <ShoppingListButton
+          ingredients={recipe.ingredients}
+          recipeTitle={recipe.title}
+          fab
+        />
       </div>
     </div>
   );
