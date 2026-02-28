@@ -29,7 +29,7 @@ See `package.json` scripts and the README for full details. Quick reference:
 - **No automated tests**: The README mentions `pnpm test` but no test framework or test files exist yet.
 - **pnpm build scripts warning**: `pnpm install` shows warnings about ignored build scripts for `@prisma/engines`, `esbuild`, `msgpackr-extract`, and `prisma`. Despite the warnings, `prisma generate` runs successfully via the `postinstall` hook.
 - **Environment validation**: `lib/env.ts` validates env vars at startup via Zod. In development mode it logs warnings and continues; in production it throws. The `DATABASE_URL` is required.
-- **Google OAuth**: Auth requires real Google OAuth credentials (`AUTH_GOOGLE_ID`, `AUTH_GOOGLE_SECRET`). With placeholder values, the app starts and all non-auth routes work, but login will fail.
+- **Google OAuth**: Auth requires real Google OAuth credentials (`AUTH_GOOGLE_ID`, `AUTH_GOOGLE_SECRET`). With placeholder values, the app starts and all non-auth routes work, but login will fail. The Google OAuth callback URL is `http://localhost:3000/api/auth/callback/google` (must be registered in the Google Cloud Console).
 - **Prisma driver adapter**: Uses `@prisma/adapter-pg` (not the traditional binary engine). The Prisma client is generated to `lib/generated/prisma/`.
 - **Husky commit hooks**: Commitlint enforces conventional commit format (e.g., `feat:`, `fix:`, `chore:`).
 - **Migration files**: `prisma migrate dev` creates migration files in `prisma/migrations/`. These are gitignored if they don't already exist in the repo — be aware that running migrations generates new files.
